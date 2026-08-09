@@ -1,11 +1,15 @@
 {
-  "buildCommand": "cd interview-agent && pip install -r backend/requirements.txt",
-  "outputDirectory": "interview-agent/backend",
-  "framework": "fastapi",
+  "buildCommand": "pip install -r interview-agent/backend/requirements.txt",
+  "startCommand": "cd interview-agent/backend && python main.py",
   "env": {
     "ANTHROPIC_API_KEY": "@ANTHROPIC_API_KEY",
     "DEBUG": "false",
     "LOG_LEVEL": "INFO",
     "PORT": "8000"
+  },
+  "functions": {
+    "interview-agent/backend/main.py": {
+      "runtime": "python3.12"
+    }
   }
 }

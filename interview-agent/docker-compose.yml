@@ -1,12 +1,25 @@
+version: '3.8'
+
 services:
   interview-agent:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: interview-agent
     ports:
       - "8000:8000"
     environment:
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
-      - DEBUG=false
-      - LOG_LEVEL=INFO
+      - DEBUG=${DEBUG:-false}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - PORT=8000
+      - PYTHONUNBUFFERED=1
     volumes:
-      - ./backend/data:/app/backend/data:ro
+      - ./interview-agent/backend/data:/app/backend/data:ro
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
