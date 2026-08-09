@@ -1,1 +1,1 @@
-"""RAG package."""
+"""RAG (Retrieval-Augmented Generation) system."""
