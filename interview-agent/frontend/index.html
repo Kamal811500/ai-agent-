@@ -1,0 +1,1934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Interview Agent — Adaptive Technical Interviews</title>
+  <meta name="description" content="Adaptive AI-powered technical interviews with real-time evaluation and actionable feedback."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<style>
+/* ─── Variables ─────────────────────────────────────────────────────────────── */
+:root {
+  --bg:         #EEEDF8;
+  --bg2:        #E5E4F2;
+  --white:      #FFFFFF;
+  --primary:    #4F46E5;
+  --primary-d:  #4338CA;
+  --primary-lt: #EEF2FF;
+  --primary-md: #C7D2FE;
+  --text:       #111827;
+  --text-b:     #374151;
+  --text-m:     #6B7280;
+  --text-l:     #9CA3AF;
+  --border:     #E5E7EB;
+  --border-l:   #F3F4F6;
+  --green:      #059669;
+  --green-l:    #ECFDF5;
+  --amber:      #D97706;
+  --amber-l:    #FFFBEB;
+  --red:        #DC2626;
+  --red-l:      #FEF2F2;
+  --r:          12px;
+  --r-lg:       18px;
+  --r-xl:       24px;
+  --sh:         0 1px 3px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.04);
+  --sh-md:      0 4px 20px rgba(0,0,0,.09);
+  --sh-lg:      0 8px 40px rgba(0,0,0,.12);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{height:100%;scroll-behavior:smooth}
+body{
+  font-family:'Inter',system-ui,sans-serif;
+  background:var(--bg);color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  min-height:100%;
+}
+#root{min-height:100vh}
+
+/* ─── Scrollbar ─────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#C7D2FE;border-radius:99px}
+
+/* ─── Animations ────────────────────────────────────────────────────────────── */
+@keyframes fadeUp   {from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn   {from{opacity:0}to{opacity:1}}
+@keyframes scaleIn  {from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+@keyframes slideLeft{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideUp  {from{opacity:0;transform:translateY(100%)}to{opacity:1;transform:translateY(0)}}
+@keyframes toastIn  {from{opacity:0;transform:translateY(16px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes toastOut {from{opacity:1}to{opacity:0;transform:scale(.9)}}
+@keyframes pulse    {0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(.85)}}
+@keyframes spin     {to{transform:rotate(360deg)}}
+@keyframes shimmer  {0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes barGrow  {from{width:0}to{width:var(--target-w)}}
+@keyframes confetti {0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(120vh) rotate(720deg);opacity:0}}
+
+.fade-up   {animation:fadeUp   .45s cubic-bezier(.22,1,.36,1) both}
+.fade-in   {animation:fadeIn   .3s ease both}
+.scale-in  {animation:scaleIn  .35s cubic-bezier(.22,1,.36,1) both}
+.slide-left{animation:slideLeft.4s  cubic-bezier(.22,1,.36,1) both}
+
+/* ─── Layout ────────────────────────────────────────────────────────────────── */
+.page{min-height:100vh;display:flex;flex-direction:column}
+.centered{display:flex;align-items:center;justify-content:center}
+
+/* ─── Card ──────────────────────────────────────────────────────────────────── */
+.card{
+  background:var(--white);border:1px solid var(--border);
+  border-radius:var(--r-lg);box-shadow:var(--sh);
+}
+.card-hover{transition:box-shadow .2s,border-color .2s,transform .2s}
+.card-hover:hover{box-shadow:var(--sh-md);border-color:var(--primary-md);transform:translateY(-2px)}
+
+/* ─── Buttons ───────────────────────────────────────────────────────────────── */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  border:none;cursor:pointer;font-family:inherit;font-weight:600;
+  transition:all .18s;border-radius:10px;white-space:nowrap;
+}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
+.btn:active:not(:disabled){transform:scale(.97)}
+
+.btn-primary{
+  padding:12px 24px;font-size:14px;
+  background:var(--primary);color:#fff;
+  box-shadow:0 2px 10px rgba(79,70,229,.3);
+}
+.btn-primary:hover:not(:disabled){background:var(--primary-d);box-shadow:0 4px 20px rgba(79,70,229,.4)}
+
+.btn-lg{padding:14px 32px;font-size:16px;border-radius:12px}
+.btn-sm{padding:8px 16px;font-size:13px;border-radius:8px}
+
+.btn-ghost{
+  padding:10px 18px;font-size:14px;
+  background:transparent;color:var(--text-b);
+  border:1px solid var(--border);
+}
+.btn-ghost:hover:not(:disabled){background:var(--border-l);border-color:var(--primary-md)}
+
+.btn-danger{
+  padding:9px 16px;font-size:13px;
+  background:var(--red-l);color:var(--red);
+  border:1px solid #FECACA;
+}
+.btn-danger:hover{background:#FEE2E2}
+
+/* ─── Inputs ────────────────────────────────────────────────────────────────── */
+.input{
+  width:100%;padding:12px 14px;
+  border:1.5px solid var(--border);border-radius:10px;
+  background:var(--white);color:var(--text);
+  font-family:inherit;font-size:15px;outline:none;
+  transition:border-color .18s,box-shadow .18s;
+}
+.input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(79,70,229,.1)}
+.input::placeholder{color:var(--text-l)}
+.input.error{border-color:var(--red);box-shadow:0 0 0 3px rgba(220,38,38,.1)}
+
+.textarea{
+  width:100%;padding:16px;
+  border:1.5px solid var(--border);border-radius:10px;
+  background:var(--white);color:var(--text);
+  font-family:inherit;font-size:15px;line-height:1.65;
+  outline:none;resize:none;
+  transition:border-color .18s,box-shadow .18s;
+}
+.textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(79,70,229,.1)}
+.textarea::placeholder{color:var(--text-l)}
+
+.label{display:block;font-size:13px;font-weight:600;color:var(--text-b);margin-bottom:6px}
+.field{margin-bottom:18px}
+.input-hint{font-size:12px;color:var(--text-m);margin-top:5px}
+.err-msg{font-size:12px;color:var(--red);margin-top:5px;display:flex;align-items:center;gap:4px}
+
+/* ─── Badges ────────────────────────────────────────────────────────────────── */
+.badge{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:3px 10px;border-radius:99px;
+  font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;
+}
+.badge-indigo{background:var(--primary-lt);color:var(--primary);border:1px solid var(--primary-md)}
+.badge-green {background:var(--green-l);color:var(--green);border:1px solid #A7F3D0}
+.badge-amber {background:var(--amber-l);color:var(--amber);border:1px solid #FDE68A}
+.badge-red   {background:var(--red-l);color:var(--red);border:1px solid #FECACA}
+.badge-gray  {background:var(--border-l);color:var(--text-m);border:1px solid var(--border)}
+
+/* ─── Progress bar ──────────────────────────────────────────────────────────── */
+.prog-track{height:5px;background:var(--border);border-radius:99px;overflow:hidden}
+.prog-fill {height:100%;background:var(--primary);border-radius:99px;transition:width .7s cubic-bezier(.4,0,.2,1)}
+
+/* ─── Score bar ─────────────────────────────────────────────────────────────── */
+.score-track{height:6px;background:var(--border);border-radius:99px;overflow:hidden}
+.score-fill {height:100%;border-radius:99px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+
+/* ─── Skill tag ─────────────────────────────────────────────────────────────── */
+.skill-tag{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:4px 10px;border-radius:7px;
+  background:var(--primary-lt);border:1px solid var(--primary-md);
+  color:var(--primary);font-size:12.5px;font-weight:500;
+}
+.skill-tag button{
+  background:none;border:none;cursor:pointer;
+  color:var(--primary);opacity:.6;padding:0;line-height:1;font-size:14px;
+  transition:opacity .15s;
+}
+.skill-tag button:hover{opacity:1}
+
+/* ─── Divider ───────────────────────────────────────────────────────────────── */
+.divider{height:1px;background:var(--border);margin:0}
+
+/* ─── Shimmer ───────────────────────────────────────────────────────────────── */
+.shimmer{
+  background:linear-gradient(90deg,#EEEDF8 25%,#E5E4F2 50%,#EEEDF8 75%);
+  background-size:200% 100%;animation:shimmer 1.6s infinite;border-radius:var(--r);
+}
+
+/* ─── Spinner ───────────────────────────────────────────────────────────────── */
+.spinner{
+  width:20px;height:20px;border-radius:50%;
+  border:2.5px solid rgba(255,255,255,.3);
+  border-top-color:#fff;animation:spin .7s linear infinite;
+}
+.spinner-dark{border-color:rgba(79,70,229,.2);border-top-color:var(--primary)}
+
+/* ─── Toast ─────────────────────────────────────────────────────────────────── */
+.toast-container{
+  position:fixed;bottom:24px;right:24px;z-index:9999;
+  display:flex;flex-direction:column;gap:10px;pointer-events:none;
+}
+.toast{
+  pointer-events:auto;
+  display:flex;align-items:center;gap:10px;
+  padding:12px 18px;border-radius:12px;
+  background:var(--text);color:#fff;
+  font-size:14px;font-weight:500;
+  box-shadow:0 8px 32px rgba(0,0,0,.2);
+  animation:toastIn .3s ease both;
+  max-width:340px;
+}
+.toast.success{background:#065F46}
+.toast.error  {background:#7F1D1D}
+.toast.info   {background:#1E3A5F}
+.toast.warning{background:#78350F}
+
+/* ─── Sidebar nav ───────────────────────────────────────────────────────────── */
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 12px;border-radius:9px;
+  font-size:13.5px;font-weight:500;color:var(--text-b);
+  cursor:pointer;transition:background .15s,color .15s;
+  border:1px solid transparent;
+}
+.nav-item:hover{background:var(--primary-lt);color:var(--primary)}
+.nav-item.active{background:var(--primary);color:#fff}
+
+/* ─── Curriculum step ───────────────────────────────────────────────────────── */
+.curr-step{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 0;font-size:13px;font-weight:500;
+  color:var(--text-l);
+}
+.curr-step.done  {color:var(--text-m)}
+.curr-step.active{color:var(--primary);font-weight:600}
+
+/* ─── Sidebar mobile overlay ────────────────────────────────────────────────── */
+.sidebar-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:40;
+}
+.sidebar-overlay.open{display:block}
+
+/* ─── Stat card ─────────────────────────────────────────────────────────────── */
+.stat-card{padding:16px;border-radius:var(--r);background:var(--bg);border:1px solid var(--border-l)}
+.stat-icon{width:36px;height:36px;display:flex;align-items:center;justify-content:center;
+           border-radius:9px;background:var(--primary-lt);margin-bottom:10px;color:var(--primary)}
+.stat-label{font-size:12px;color:var(--text-m);margin-bottom:3px}
+.stat-value{font-size:14px;font-weight:700;color:var(--text);line-height:1.3}
+
+/* ─── Landing hero ──────────────────────────────────────────────────────────── */
+.hero{
+  min-height:100vh;background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;
+  padding:0 20px;
+}
+.hero-content{
+  max-width:680px;text-align:center;
+  padding:80px 0 60px;
+}
+.hero h1{font-size:clamp(32px,5vw,56px);font-weight:800;line-height:1.1;letter-spacing:-.03em;margin-bottom:20px}
+.hero p{font-size:17px;color:var(--text-m);line-height:1.7;max-width:520px;margin:0 auto 28px}
+.pill-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:7px 18px;border-radius:99px;
+  border:1.5px solid var(--primary-md);background:var(--white);
+  font-size:14px;font-weight:500;color:var(--primary);
+  box-shadow:var(--sh);margin-bottom:28px;
+}
+.feature-pills{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:36px;font-size:13px;color:var(--text-m)}
+.dot-sep{color:var(--border);font-size:16px}
+.how-it-works{width:100%;max-width:900px;padding-bottom:80px}
+.hiw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(195px,1fr));gap:16px;margin-top:24px}
+.hiw-card{padding:22px 20px}
+.hiw-num{width:34px;height:34px;border-radius:9px;background:var(--primary-lt);
+          display:flex;align-items:center;justify-content:center;
+          font-size:12px;font-weight:700;color:var(--primary);margin-bottom:14px}
+.hiw-title{font-weight:700;font-size:15px;margin-bottom:7px}
+.hiw-desc{font-size:13px;color:var(--text-m);line-height:1.6}
+
+/* ─── Auth screen ───────────────────────────────────────────────────────────── */
+.auth-wrap{
+  min-height:100vh;background:var(--bg);
+  display:flex;align-items:center;justify-content:center;padding:24px;
+}
+.auth-card{width:100%;max-width:440px;padding:40px;border-radius:var(--r-xl);box-shadow:var(--sh-lg)}
+.auth-logo{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:28px}
+.auth-logo-icon{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#818CF8,#4F46E5);display:flex;align-items:center;justify-content:center;color:#fff}
+.auth-logo-text{font-weight:800;font-size:17px;color:var(--text)}
+.auth-title{font-size:24px;font-weight:800;margin-bottom:6px;text-align:center}
+.auth-sub  {font-size:14px;color:var(--text-m);text-align:center;margin-bottom:28px}
+.auth-divider{display:flex;align-items:center;gap:12px;margin:20px 0;color:var(--text-l);font-size:12px}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.auth-footer{font-size:12px;color:var(--text-l);text-align:center;margin-top:20px;line-height:1.6}
+
+/* ─── Profile setup ─────────────────────────────────────────────────────────── */
+.profile-wrap{
+  min-height:100vh;background:var(--bg);
+  display:flex;flex-direction:column;
+}
+.profile-topbar{
+  padding:16px 32px;background:var(--white);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:10;
+}
+.profile-content{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:40px 24px}
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;width:100%;max-width:820px}
+.profile-card{padding:28px}
+.profile-section-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-m);margin-bottom:18px}
+.step-indicator{display:flex;align-items:center;gap:8px}
+.step-dot{width:8px;height:8px;border-radius:50%}
+.step-dot.done{background:var(--primary)}
+.step-dot.current{background:var(--primary);box-shadow:0 0 0 3px var(--primary-lt)}
+.step-dot.todo{background:var(--border)}
+.focus-chip{
+  padding:7px 14px;border-radius:8px;font-size:13px;font-weight:500;
+  border:1.5px solid var(--border);background:var(--white);cursor:pointer;
+  transition:all .15s;color:var(--text-b);
+}
+.focus-chip.selected{border-color:var(--primary);background:var(--primary-lt);color:var(--primary)}
+.exp-stepper{display:flex;align-items:center;gap:12px}
+.exp-stepper button{
+  width:36px;height:36px;border-radius:9px;border:1.5px solid var(--border);
+  background:var(--white);cursor:pointer;font-size:18px;color:var(--primary);
+  display:flex;align-items:center;justify-content:center;transition:all .15s;font-weight:700;
+}
+.exp-stepper button:hover{border-color:var(--primary);background:var(--primary-lt)}
+.exp-val{font-size:20px;font-weight:800;color:var(--text);min-width:40px;text-align:center}
+
+/* ─── Briefing screen ───────────────────────────────────────────────────────── */
+.brief-wrap{
+  min-height:100vh;background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:40px 24px;
+}
+.brief-grid{display:grid;grid-template-columns:1fr 1.2fr;gap:24px;width:100%;max-width:780px}
+.brief-profile-card{padding:28px;display:flex;flex-direction:column;align-items:center;text-align:center}
+.brief-avatar{
+  width:72px;height:72px;border-radius:50%;
+  background:linear-gradient(135deg,#818CF8,#4F46E5);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-weight:800;font-size:26px;
+  border:3px solid var(--primary-md);margin-bottom:14px;
+}
+.brief-overview-card{padding:28px}
+.brief-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px}
+.brief-timeline{margin-top:0}
+.brief-tl-item{display:flex;gap:12px;margin-bottom:14px;font-size:13.5px}
+.brief-tl-num{
+  width:22px;height:22px;border-radius:50%;
+  background:var(--primary-lt);border:1.5px solid var(--primary-md);
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:700;color:var(--primary);flex-shrink:0;
+}
+
+/* ─── Interview screen ──────────────────────────────────────────────────────── */
+.interview-layout{display:flex;height:100vh;background:var(--bg)}
+.interview-sidebar{
+  width:220px;background:var(--white);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;flex-shrink:0;
+  transition:transform .3s;z-index:30;
+}
+.interview-main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.interview-topbar{
+  height:56px;background:var(--white);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;padding:0 24px;flex-shrink:0;
+}
+.interview-body{flex:1;overflow-y:auto;padding:24px 32px;display:flex;flex-direction:column;gap:18px}
+.question-card{padding:24px 28px}
+.question-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.question-sep{width:100%;height:1px;background:var(--border);margin-bottom:20px}
+.question-text{font-size:19px;font-weight:600;line-height:1.55;color:var(--text)}
+.answer-card{flex:1}
+.answer-header{
+  padding:12px 18px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.answer-body{flex:1;padding:4px}
+.answer-footer{
+  padding:12px 18px;border-top:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--bg);border-radius:0 0 var(--r-lg) var(--r-lg);
+}
+.interview-timer{font-size:13px;font-weight:600;color:var(--primary);
+                 display:flex;align-items:center;gap:5px}
+.hamburger{
+  display:none;background:none;border:none;cursor:pointer;
+  padding:8px;border-radius:8px;color:var(--text-b);
+  flex-direction:column;gap:4px;
+}
+.hamburger span{display:block;width:18px;height:2px;background:currentColor;border-radius:2px}
+
+/* ─── Results screen ────────────────────────────────────────────────────────── */
+.results-layout{display:flex;height:100vh;background:var(--bg)}
+.results-sidebar{
+  width:220px;background:var(--white);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;flex-shrink:0;padding:16px 12px;
+}
+.results-main{flex:1;overflow-y:auto;padding:28px}
+.results-topbar{
+  height:56px;background:var(--white);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;padding:0 28px;
+  flex-shrink:0;
+}
+.results-grid-top{display:grid;grid-template-columns:1fr 200px;gap:16px;margin-bottom:16px}
+.results-score-box{
+  background:var(--primary);border-radius:var(--r-lg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:28px 20px;color:#fff;
+}
+.results-grid-mid{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:16px;margin-bottom:16px}
+.results-gap-card{padding:20px;margin-bottom:16px}
+.results-cov-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px}
+
+/* ─── Confetti ──────────────────────────────────────────────────────────────── */
+.confetti-piece{
+  position:fixed;width:10px;height:10px;border-radius:2px;
+  animation:confetti linear forwards;
+  pointer-events:none;z-index:9999;
+}
+
+/* ─── Responsive ────────────────────────────────────────────────────────────── */
+@media (max-width:900px){
+  .results-grid-top{grid-template-columns:1fr}
+  .results-grid-mid{grid-template-columns:1fr 1fr}
+  .results-sidebar{display:none}
+  .results-layout{display:block;height:auto;overflow:auto}
+  .results-main{padding:16px}
+}
+@media (max-width:768px){
+  .profile-grid{grid-template-columns:1fr}
+  .brief-grid{grid-template-columns:1fr}
+  .profile-topbar{padding:12px 16px}
+  .interview-sidebar{
+    position:fixed;left:0;top:0;bottom:0;
+    transform:translateX(-100%);
+  }
+  .interview-sidebar.open{transform:translateX(0);box-shadow:var(--sh-lg)}
+  .hamburger{display:flex}
+  .interview-body{padding:16px}
+  .results-grid-mid{grid-template-columns:1fr}
+  .hiw-grid{grid-template-columns:1fr 1fr}
+  .hero h1{font-size:32px}
+  .auth-card{padding:28px}
+  .profile-content{padding:16px}
+  .brief-wrap{padding:20px 16px;align-items:flex-start;justify-content:flex-start}
+}
+@media (max-width:480px){
+  .hiw-grid{grid-template-columns:1fr}
+  .brief-stats{grid-template-columns:1fr}
+  .auth-card{padding:24px}
+  .interview-body{padding:12px}
+  .question-text{font-size:16px}
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback, useReducer } = React;
+const API = '/api';
+
+/* ─── API layer ─────────────────────────────────────────────────────────────── */
+const http = {
+  async post(url, body) {
+    const r = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const data = await r.json().catch(() => ({ detail: r.statusText }));
+    if (!r.ok) throw new Error(data.detail || 'Request failed');
+    return data;
+  },
+  async get(url) {
+    const r = await fetch(url);
+    const data = await r.json().catch(() => ({ detail: r.statusText }));
+    if (!r.ok) throw new Error(data.detail || 'Request failed');
+    return data;
+  },
+};
+const api = {
+  login: (email, name) => http.post(`${API}/auth/login`, { email, name }),
+  startInterview: (profile) => http.post(`${API}/interviews/start`, profile),
+  submitAnswer: (id, qid, answer) => http.post(`${API}/interviews/${id}/respond`, { question_id: qid, answer }),
+  getReport: (id) => http.get(`${API}/interviews/${id}/report`),
+};
+
+/* ─── Helpers ───────────────────────────────────────────────────────────────── */
+function scoreColor(v, max = 100) {
+  const p = v / max;
+  return p >= .8 ? '#059669' : p >= .65 ? '#4F46E5' : p >= .5 ? '#D97706' : '#DC2626';
+}
+function recLabel(r) {
+  return { STRONG_HIRE: 'Strong Hire', HIRE: 'Hire', BORDERLINE: 'Borderline', NO_HIRE: 'No Hire' }[r] || r;
+}
+function recColor(r) {
+  return { STRONG_HIRE:'#059669', HIRE:'#4F46E5', BORDERLINE:'#D97706', NO_HIRE:'#DC2626' }[r] || '#6B7280';
+}
+function fmtTime(s) {
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+}
+function diffBadge(d) {
+  return { easy:'badge-green', medium:'badge-indigo', hard:'badge-amber', expert:'badge-red' }[d] || 'badge-gray';
+}
+function levelFromExp(y) { return y < 2 ? 'Junior' : y < 6 ? 'Mid-level' : 'Senior'; }
+
+/* ─── LocalStorage ──────────────────────────────────────────────────────────── */
+const LS = {
+  get: (k) => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
+  set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+  del: (k) => { try { localStorage.removeItem(k); } catch {} },
+};
+
+/* ─── Toast system ──────────────────────────────────────────────────────────── */
+function useToast() {
+  const [toasts, setToasts] = useState([]);
+  const show = useCallback((msg, type = 'info') => {
+    const id = Date.now() + Math.random();
+    setToasts(p => [...p, { id, msg, type }]);
+    setTimeout(() => setToasts(p => p.filter(t => t.id !== id)), 4000);
+  }, []);
+  return { toasts, show };
+}
+
+function ToastContainer({ toasts }) {
+  if (!toasts.length) return null;
+  const icons = { success: '✓', error: '✕', info: 'ℹ', warning: '⚠' };
+  return (
+    <div className="toast-container">
+      {toasts.map(t => (
+        <div key={t.id} className={`toast ${t.type}`}>
+          <span style={{fontSize:16,flexShrink:0}}>{icons[t.type] || 'ℹ'}</span>
+          <span>{t.msg}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ─── Confetti ──────────────────────────────────────────────────────────────── */
+function Confetti() {
+  const colors = ['#4F46E5','#818CF8','#10B981','#F59E0B','#EF4444','#EC4899'];
+  const pieces = Array.from({ length: 40 }, (_, i) => ({
+    id: i,
+    color: colors[i % colors.length],
+    left: `${Math.random() * 100}%`,
+    delay: `${Math.random() * 2}s`,
+    duration: `${2 + Math.random() * 3}s`,
+    size: `${6 + Math.random() * 8}px`,
+  }));
+  return (
+    <>
+      {pieces.map(p => (
+        <div key={p.id} className="confetti-piece" style={{
+          background: p.color, left: p.left, top: '-20px',
+          width: p.size, height: p.size,
+          animationDelay: p.delay, animationDuration: p.duration,
+        }} />
+      ))}
+    </>
+  );
+}
+
+/* ─── SVG Icons ─────────────────────────────────────────────────────────────── */
+const I = {
+  bot:      <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8"><rect x="2" y="7" width="20" height="14" rx="3"/><path d="M12 7V3M8 3h8M6 11h.01M18 11h.01M9 15h6"/></svg>,
+  arrow:    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.2"><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>,
+  check:    <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>,
+  zap:      <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path fillRule="evenodd" d="M14.615 1.595a.75.75 0 01.359.852L12.982 9.75h7.268a.75.75 0 01.548 1.262l-10.5 11.25a.75.75 0 01-1.272-.71l1.992-7.302H3.75a.75.75 0 01-.548-1.262l10.5-11.25a.75.75 0 01.913-.143z" clipRule="evenodd"/></svg>,
+  book:     <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0118 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>,
+  trend:    <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941"/></svg>,
+  clock:    <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="#4F46E5" strokeWidth="1.5"><circle cx="12" cy="12" r="9"/><path strokeLinecap="round" strokeLinejoin="round" d="M12 7v5l3 3"/></svg>,
+  q:        <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="#4F46E5" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><path strokeLinecap="round" strokeLinejoin="round" d="M9.75 9.75c0-1.036.84-1.875 1.875-1.875S13.5 8.714 13.5 9.75c0 1.036-.84 1.875-1.875 1.875M12 15h.01"/></svg>,
+  layers:   <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="#4F46E5" strokeWidth="1.5"><path strokeLinecap="round" strokeLinejoin="round" d="M6.429 9.75L2.25 12l4.179 2.25m0-4.5l5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L21.75 12l-4.179 2.25m0 0l4.179 2.25L12 21.75 2.25 16.5l4.179-2.25m11.142 0l-5.571 3-5.571-3"/></svg>,
+  chat:     <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="#4F46E5" strokeWidth="1.5"><path strokeLinecap="round" strokeLinejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155"/></svg>,
+  mail:     <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8"><path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>,
+  user:     <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>,
+  code:     <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5"/></svg>,
+  logout:   <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg>,
+  circle:   <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="9"/></svg>,
+  dot:      <svg width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="#4F46E5" strokeWidth="1.5"/><circle cx="12" cy="12" r="4" fill="#4F46E5"/></svg>,
+  done_c:   <svg width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="#9CA3AF" strokeWidth="1.5"/><path d="M8 12.5l2.5 2.5 5-5" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+  warn:     <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#F59E0B" strokeWidth="1.8"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>,
+  chart:    <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8"><path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg>,
+  shield:   <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>,
+  trophy:   <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5"><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 01-.982-3.172M9.497 14.25a7.454 7.454 0 00.981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 007.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 002.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 012.916.52 6.003 6.003 0 01-5.395 4.972m0 0a6.726 6.726 0 01-2.749 1.35m0 0a6.772 6.772 0 01-3.044 0"/></svg>,
+  print:    <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8"><path strokeLinecap="round" strokeLinejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z"/></svg>,
+  dash:     <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>,
+  brief:    <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8"><path strokeLinecap="round" strokeLinejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 00.75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 00-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0112 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 01-.673-.38m0 0A2.18 2.18 0 013 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 013.413-.387m7.5 0V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25v.894m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>,
+  curr:     <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8"><path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0118 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>,
+  analytics:<svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941"/></svg>,
+  support:  <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8"><path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"/></svg>,
+  settings: <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8"><path strokeLinecap="round" strokeLinejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"/><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>,
+};
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   SCREEN 1: LANDING
+═══════════════════════════════════════════════════════════════════════════════ */
+function LandingScreen({ onStart, user }) {
+  return (
+    <div className="hero">
+      {/* Navbar */}
+      <div style={{width:'100%',padding:'16px 32px',display:'flex',alignItems:'center',justifyContent:'space-between',position:'sticky',top:0,background:'var(--bg)',zIndex:10,borderBottom:'1px solid transparent'}}>
+        <div style={{display:'flex',alignItems:'center',gap:9,fontWeight:800,fontSize:16}}>
+          <div style={{width:32,height:32,borderRadius:9,background:'linear-gradient(135deg,#818CF8,#4F46E5)',display:'flex',alignItems:'center',justifyContent:'center',color:'#fff'}}>{I.bot}</div>
+          AI Interview Agent
+        </div>
+        {user ? (
+          <div style={{display:'flex',alignItems:'center',gap:10}}>
+            <span style={{fontSize:13,color:'var(--text-m)'}}>Hello, <strong>{user.name.split(' ')[0]}</strong></span>
+            <button className="btn btn-primary btn-sm" onClick={onStart}>Continue {I.arrow}</button>
+          </div>
+        ) : (
+          <button className="btn btn-ghost btn-sm" onClick={onStart}>Get Started {I.arrow}</button>
+        )}
+      </div>
+
+      {/* Hero content */}
+      <div className="hero-content fade-up">
+        <div className="pill-badge">{I.bot} AI Interview Agent</div>
+        <h1>Adaptive technical interviews<br/>powered by AI.</h1>
+        <p>Evaluate your technical knowledge through a conversational, curriculum-driven interview designed to provide deep insights and actionable feedback.</p>
+        <div className="feature-pills">
+          <span style={{display:'flex',alignItems:'center',gap:5}}>{I.zap} AI-powered</span>
+          <span className="dot-sep">·</span>
+          <span style={{display:'flex',alignItems:'center',gap:5}}>{I.book} Curriculum-based</span>
+          <span className="dot-sep">·</span>
+          <span style={{display:'flex',alignItems:'center',gap:5}}>{I.trend} Adaptive</span>
+        </div>
+        <button className="btn btn-primary btn-lg fade-up" style={{animationDelay:'.1s'}} onClick={onStart}>
+          {user ? 'Continue Interview' : 'Start Interview'} {I.arrow}
+        </button>
+      </div>
+
+      {/* How it works */}
+      <div className="how-it-works fade-up" style={{animationDelay:'.15s'}}>
+        <h2 style={{textAlign:'center',fontSize:22,fontWeight:700}}>How it works</h2>
+        <div className="hiw-grid">
+          {[
+            {n:'01',title:'Sign In',desc:'Enter your email and name to get started. No password required.'},
+            {n:'02',title:'Set Up Profile',desc:'Tell us your role, experience, and skills for a tailored interview.'},
+            {n:'03',title:'Interview',desc:'Answer adaptive questions across curriculum topics in real-time.'},
+            {n:'04',title:'Get Feedback',desc:'Receive a structured report with scores, strengths, and improvement plan.'},
+          ].map((s,i) => (
+            <div key={i} className="card hiw-card card-hover fade-up" style={{animationDelay:`${.2+i*.08}s`}}>
+              <div className="hiw-num">{s.n}</div>
+              <div className="hiw-title">{s.title}</div>
+              <div className="hiw-desc">{s.desc}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   SCREEN 2: LOGIN
+═══════════════════════════════════════════════════════════════════════════════ */
+function LoginScreen({ onLogin, onBack, toast }) {
+  const [email, setEmail]   = useState('');
+  const [name, setName]     = useState('');
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  const validate = () => {
+    const e = {};
+    if (!email.includes('@')) e.email = 'Enter a valid email address';
+    if (name.trim().length < 2) e.name = 'Enter your full name';
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
+  const submit = async () => {
+    if (!validate() || loading) return;
+    setLoading(true);
+    try {
+      const user = await api.login(email.trim(), name.trim());
+      LS.set('ai_interview_user', user);
+      toast('Welcome, ' + user.name.split(' ')[0] + '! 👋', 'success');
+      onLogin(user);
+    } catch (e) {
+      toast(e.message, 'error');
+    } finally { setLoading(false); }
+  };
+
+  const handleKey = (e) => { if (e.key === 'Enter') submit(); };
+
+  return (
+    <div className="auth-wrap fade-in">
+      <div className="card auth-card scale-in">
+        {/* Logo */}
+        <div className="auth-logo">
+          <div className="auth-logo-icon">{I.bot}</div>
+          <div className="auth-logo-text">AI Interview Agent</div>
+        </div>
+
+        <div className="auth-title">Welcome!</div>
+        <div className="auth-sub">Enter your email to get started — no password needed.</div>
+
+        <div className="field">
+          <label className="label">Email address</label>
+          <div style={{position:'relative'}}>
+            <div style={{position:'absolute',left:12,top:'50%',transform:'translateY(-50%)',color:'var(--text-l)'}}>{I.mail}</div>
+            <input className={`input ${errors.email?'error':''}`} type="email" placeholder="you@example.com"
+              value={email} onChange={e=>setEmail(e.target.value)} onKeyDown={handleKey}
+              style={{paddingLeft:40}} autoFocus autoComplete="email"/>
+          </div>
+          {errors.email && <div className="err-msg">⚠ {errors.email}</div>}
+        </div>
+
+        <div className="field">
+          <label className="label">Full name</label>
+          <div style={{position:'relative'}}>
+            <div style={{position:'absolute',left:12,top:'50%',transform:'translateY(-50%)',color:'var(--text-l)'}}>{I.user}</div>
+            <input className={`input ${errors.name?'error':''}`} type="text" placeholder="Alex Johnson"
+              value={name} onChange={e=>setName(e.target.value)} onKeyDown={handleKey}
+              style={{paddingLeft:40}} autoComplete="name"/>
+          </div>
+          {errors.name && <div className="err-msg">⚠ {errors.name}</div>}
+        </div>
+
+        <button className="btn btn-primary" style={{width:'100%',padding:'13px',fontSize:15}} onClick={submit} disabled={loading}>
+          {loading ? <><div className="spinner" style={{width:16,height:16}}/> Signing in...</> : <>Continue {I.arrow}</>}
+        </button>
+
+        <div className="auth-footer">
+          By continuing, you agree to our Terms of Service.<br/>
+          Your data is not stored beyond this session.
+        </div>
+
+        <div style={{textAlign:'center',marginTop:16}}>
+          <button className="btn btn-ghost btn-sm" onClick={onBack}>← Back to Home</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   SCREEN 3: PROFILE SETUP
+═══════════════════════════════════════════════════════════════════════════════ */
+const FOCUS_AREAS = [
+  'Python','JavaScript','Databases','Machine Learning',
+  'System Design','APIs','Algorithms','Security',
+  'Cloud','DevOps','Deep Learning','Data Structures',
+];
+const ROLE_SUGGESTIONS = [
+  'Software Engineer','Full Stack Developer','Backend Engineer',
+  'Frontend Engineer','ML Engineer','Data Scientist','DevOps Engineer',
+];
+
+function ProfileSetup({ user, onContinue, onLogout, toast }) {
+  const [role, setRole]       = useState('');
+  const [exp, setExp]         = useState(2);
+  const [skills, setSkills]   = useState([]);
+  const [skillInput, setSkillInput] = useState('');
+  const [focus, setFocus]     = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError]     = useState('');
+  const [showRoleSugg, setShowRoleSugg] = useState(false);
+
+  const applyPreset = (presetRole, presetExp, presetSkills, presetFocus) => {
+    setRole(presetRole);
+    setExp(presetExp);
+    setSkills(presetSkills);
+    setFocus(presetFocus);
+    toast(`Loaded preset: ${presetRole}`, 'info');
+  };
+
+  const addSkill = (s) => {
+    const sk = s.trim();
+    if (sk && !skills.includes(sk) && skills.length < 20) {
+      setSkills(p => [...p, sk]);
+      setSkillInput('');
+    }
+  };
+  const removeSkill = (s) => setSkills(p => p.filter(x => x !== s));
+  const toggleFocus = (f) => setFocus(p => p.includes(f) ? p.filter(x=>x!==f) : [...p, f]);
+
+  const handleSkillKey = (e) => {
+    if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); addSkill(skillInput); }
+    if (e.key === 'Backspace' && !skillInput && skills.length) removeSkill(skills[skills.length-1]);
+  };
+
+  const submit = async () => {
+    if (!role.trim()) { setError('Please enter your role or job title.'); return; }
+    if (skills.length < 1) { setError('Add at least one skill.'); return; }
+    setError(''); setLoading(true);
+    try {
+      const state = await api.startInterview({
+        name: user.name, email: user.email,
+        role: role.trim(), experience_years: exp,
+        skills, focus_areas: focus,
+      });
+      onContinue(state, { role, exp, skills, focus });
+    } catch(e) {
+      toast(e.message, 'error');
+      setError(e.message);
+    } finally { setLoading(false); }
+  };
+
+  const roleSugg = ROLE_SUGGESTIONS.filter(r => r.toLowerCase().includes(role.toLowerCase()) && r !== role);
+
+  return (
+    <div className="profile-wrap">
+      {/* Top bar */}
+      <div className="profile-topbar">
+        <div style={{display:'flex',alignItems:'center',gap:9,fontWeight:700,fontSize:15}}>
+          <div style={{width:28,height:28,borderRadius:8,background:'linear-gradient(135deg,#818CF8,#4F46E5)',display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontSize:13}}>{I.bot}</div>
+          AI Interview Agent
+        </div>
+        <div style={{display:'flex',alignItems:'center',gap:10}}>
+          <div style={{display:'flex',gap:6,alignItems:'center'}}>
+            {[1,2,3].map(n => (
+              <div key={n} className={`step-dot ${n===1?'done':n===2?'current':'todo'}`}/>
+            ))}
+          </div>
+          <span style={{fontSize:12,color:'var(--text-m)',fontWeight:500}}>Step 2 of 3</span>
+          <button className="btn btn-ghost btn-sm" onClick={onLogout} style={{gap:6}}>
+            {I.logout} Sign out
+          </button>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="profile-content" style={{flexDirection:'column',alignItems:'center'}}>
+        {/* Sample Profile Presets */}
+        <div style={{width:'100%',maxWidth:820,marginBottom:16,background:'var(--white)',padding:'14px 20px',borderRadius:14,border:'1px solid var(--border)',boxShadow:'var(--sh)',display:'flex',alignItems:'center',justifyContent:'space-between',flexWrap:'wrap',gap:10}}>
+          <div style={{fontSize:13,fontWeight:700,color:'var(--text-b)',display:'flex',alignItems:'center',gap:6}}>
+            ⚡ Quick Sample Presets:
+          </div>
+          <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
+            <button className="btn btn-ghost btn-sm" style={{fontSize:12,padding:'5px 10px'}}
+              onClick={()=>applyPreset('Junior Software Engineer', 1, ['Python', 'Flask', 'SQL', 'Git'], ['Python', 'Algorithms'])}>
+              Junior Engineer (1y)
+            </button>
+            <button className="btn btn-ghost btn-sm" style={{fontSize:12,padding:'5px 10px'}}
+              onClick={()=>applyPreset('Mid Full Stack Developer', 4, ['React', 'Node.js', 'PostgreSQL', 'Docker', 'REST APIs'], ['Databases', 'APIs', 'System Design'])}>
+              Mid-Level Developer (4y)
+            </button>
+            <button className="btn btn-ghost btn-sm" style={{fontSize:12,padding:'5px 10px'}}
+              onClick={()=>applyPreset('Senior ML Engineer', 8, ['PyTorch', 'Transformers', 'Kubeflow', 'System Design', 'MLOps'], ['Machine Learning', 'Deep Learning', 'LLMs', 'MLOps'])}>
+              Senior ML Engineer (8y)
+            </button>
+          </div>
+        </div>
+
+        <div className="profile-grid">
+          {/* Left card: Personal info */}
+          <div className="card profile-card scale-in">
+            <div className="profile-section-title">Your Profile</div>
+
+            {/* Avatar & Name (from login) */}
+            <div style={{display:'flex',alignItems:'center',gap:14,padding:'14px',background:'var(--bg)',borderRadius:12,marginBottom:22}}>
+              <div style={{width:48,height:48,borderRadius:'50%',background:'linear-gradient(135deg,#818CF8,#4F46E5)',display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontWeight:800,fontSize:18,flexShrink:0}}>
+                {user.name[0].toUpperCase()}
+              </div>
+              <div>
+                <div style={{fontWeight:700,fontSize:15}}>{user.name}</div>
+                <div style={{fontSize:13,color:'var(--text-m)'}}>{user.email}</div>
+              </div>
+            </div>
+
+            {/* Role */}
+            <div className="field" style={{position:'relative'}}>
+              <label className="label">Current Role / Job Title</label>
+              <input className="input" type="text" placeholder="e.g. Full Stack Developer"
+                value={role} onChange={e=>{setRole(e.target.value);setShowRoleSugg(true)}}
+                onBlur={()=>setTimeout(()=>setShowRoleSugg(false),150)}/>
+              {showRoleSugg && role && roleSugg.length > 0 && (
+                <div style={{position:'absolute',top:'100%',left:0,right:0,background:'var(--white)',border:'1.5px solid var(--primary-md)',borderRadius:10,boxShadow:'var(--sh-md)',zIndex:20,marginTop:4}}>
+                  {roleSugg.slice(0,4).map(r => (
+                    <div key={r} onClick={()=>{setRole(r);setShowRoleSugg(false)}}
+                      style={{padding:'10px 14px',cursor:'pointer',fontSize:14,color:'var(--text-b)',transition:'background .12s'}}
+                      onMouseEnter={e=>e.target.style.background='var(--bg)'}
+                      onMouseLeave={e=>e.target.style.background='transparent'}>
+                      {r}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Experience */}
+            <div className="field">
+              <label className="label">Years of Experience</label>
+              <div className="exp-stepper">
+                <button onClick={()=>setExp(Math.max(0,exp-1))}>−</button>
+                <div className="exp-val">{exp}</div>
+                <button onClick={()=>setExp(Math.min(30,exp+1))}>+</button>
+                <div style={{fontSize:13,color:'var(--text-m)',marginLeft:4}}>
+                  years · <strong>{levelFromExp(exp)}</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right card: Skills & Focus */}
+          <div className="card profile-card scale-in" style={{animationDelay:'.05s'}}>
+            <div className="profile-section-title">Skills & Focus Areas</div>
+
+            {/* Skills tag input */}
+            <div className="field">
+              <label className="label">Technical Skills <span style={{color:'var(--text-l)',fontWeight:400}}>({skills.length}/20)</span></label>
+              <div style={{
+                minHeight:80,padding:'8px 10px',border:'1.5px solid var(--border)',borderRadius:10,
+                display:'flex',flexWrap:'wrap',gap:6,cursor:'text',background:'var(--white)',
+                transition:'border-color .18s'
+              }}
+                onClick={e=>{const inp=e.currentTarget.querySelector('input');inp&&inp.focus()}}
+                onFocus={e=>e.currentTarget.style.borderColor='var(--primary)'}
+                onBlur={e=>e.currentTarget.style.borderColor='var(--border)'}>
+                {skills.map(s => (
+                  <span key={s} className="skill-tag">
+                    {s}<button onClick={()=>removeSkill(s)}>×</button>
+                  </span>
+                ))}
+                <input style={{border:'none',outline:'none',fontSize:14,minWidth:120,flex:1,background:'transparent',color:'var(--text)'}}
+                  value={skillInput}
+                  onChange={e=>setSkillInput(e.target.value)}
+                  onKeyDown={handleSkillKey}
+                  placeholder={skills.length===0?'Type skill, press Enter...':''}/>
+              </div>
+              <div className="input-hint">Press Enter or comma to add · Backspace to remove last</div>
+            </div>
+
+            {/* Focus areas */}
+            <div className="field">
+              <label className="label">Interview Focus Areas <span style={{color:'var(--text-l)',fontWeight:400}}>(optional)</span></label>
+              <div style={{display:'flex',flexWrap:'wrap',gap:8}}>
+                {FOCUS_AREAS.map(f => (
+                  <button key={f} className={`focus-chip ${focus.includes(f)?'selected':''}`}
+                    onClick={()=>toggleFocus(f)}>
+                    {f}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {error && <div className="err-msg" style={{marginBottom:14}}>⚠ {error}</div>}
+
+            <button className="btn btn-primary" style={{width:'100%',padding:'13px',fontSize:15,marginTop:'auto'}}
+              onClick={submit} disabled={loading}>
+              {loading ? <><div className="spinner" style={{width:16,height:16}}/> Creating interview...</> : <>Start Interview {I.arrow}</>}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   SCREEN 4: INTERVIEW BRIEFING
+═══════════════════════════════════════════════════════════════════════════════ */
+function BriefingScreen({ user, profile, interviewState, onBegin }) {
+  return (
+    <div className="brief-wrap">
+      {/* Header */}
+      <div style={{marginBottom:28,textAlign:'center'}} className="fade-up">
+        <div style={{display:'inline-flex',alignItems:'center',gap:8,padding:'6px 16px',borderRadius:99,border:'1.5px solid var(--primary-md)',background:'var(--white)',fontSize:13,fontWeight:500,color:'var(--primary)',marginBottom:16}}>
+          {I.bot} Your Interview is Ready
+        </div>
+        <h1 style={{fontSize:28,fontWeight:800,marginBottom:6}}>Ready to begin?</h1>
+        <p style={{fontSize:15,color:'var(--text-m)'}}>Review your profile and what to expect</p>
+      </div>
+
+      <div className="brief-grid scale-in">
+        {/* Profile card */}
+        <div className="card brief-profile-card">
+          <div className="brief-avatar">{user.name[0].toUpperCase()}</div>
+          <div style={{fontWeight:700,fontSize:18,marginBottom:4}}>{user.name}</div>
+          <div style={{fontSize:14,color:'var(--text-m)',marginBottom:16}}>{profile.role}</div>
+
+          <div style={{display:'flex',gap:8,justifyContent:'center',flexWrap:'wrap',marginBottom:18}}>
+            <span className="badge badge-indigo">{levelFromExp(profile.exp)}</span>
+            <span className="badge badge-gray">{profile.exp}y exp</span>
+          </div>
+
+          <div style={{width:'100%',textAlign:'left',background:'var(--bg)',borderRadius:10,padding:'12px 14px'}}>
+            <div style={{fontSize:12,fontWeight:600,color:'var(--text-m)',textTransform:'uppercase',letterSpacing:'.08em',marginBottom:8}}>Skills</div>
+            <div style={{display:'flex',flexWrap:'wrap',gap:5}}>
+              {profile.skills.slice(0,8).map(s => (
+                <span key={s} style={{padding:'3px 8px',borderRadius:6,background:'var(--white)',border:'1px solid var(--border)',fontSize:12,color:'var(--text-b)'}}>{s}</span>
+              ))}
+              {profile.skills.length > 8 && <span style={{fontSize:12,color:'var(--text-l)'}}>+{profile.skills.length-8} more</span>}
+            </div>
+          </div>
+        </div>
+
+        {/* Overview card */}
+        <div className="card brief-overview-card">
+          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:20}}>
+            <div style={{fontWeight:700,fontSize:18}}>Interview Overview</div>
+            <div className="badge badge-indigo">{I.bot} AI Driven</div>
+          </div>
+
+          <div className="brief-stats">
+            {[
+              {icon:I.clock,label:'Duration',val:'20–30 minutes'},
+              {icon:I.q,    label:'Questions',val:'8+ adaptive'},
+              {icon:I.layers,label:'Topics',  val:'4+ areas'},
+              {icon:I.chat, label:'Format',   val:'Conversational'},
+            ].map((s,i) => (
+              <div className="stat-card" key={i}>
+                <div className="stat-icon">{s.icon}</div>
+                <div className="stat-label">{s.label}</div>
+                <div className="stat-value">{s.val}</div>
+              </div>
+            ))}
+          </div>
+
+          <div className="divider" style={{marginBottom:16}}/>
+
+          <div style={{fontSize:13,fontWeight:600,color:'var(--text-m)',marginBottom:10,textTransform:'uppercase',letterSpacing:'.07em'}}>What happens</div>
+          {[
+            {n:'1',t:'AI reviews your profile and plans the interview'},
+            {n:'2',t:'Questions adapt based on your answers in real-time'},
+            {n:'3',t:'Follow-up questions probe areas needing depth'},
+            {n:'4',t:'Final report with scores, strengths, and next steps'},
+          ].map(item => (
+            <div className="brief-tl-item" key={item.n}>
+              <div className="brief-tl-num">{item.n}</div>
+              <div style={{color:'var(--text-b)',lineHeight:1.5}}>{item.t}</div>
+            </div>
+          ))}
+
+          <div className="divider" style={{margin:'16px 0'}}/>
+          <div style={{display:'flex',justifyContent:'flex-end'}}>
+            <button className="btn btn-primary" style={{fontSize:15,padding:'13px 28px'}} onClick={onBegin}>
+              Begin Interview {I.arrow}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   SCREEN 5: INTERVIEW
+═══════════════════════════════════════════════════════════════════════════════ */
+function InterviewScreen({ initialState, user, profile, onComplete, toast }) {
+  const [state, setState]       = useState(initialState);
+  const [answer, setAnswer]     = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [elapsed, setElapsed]   = useState(0);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [milestone, setMilestone] = useState({ q8:false, d4:false });
+  const textareaRef             = useRef(null);
+  const startRef                = useRef(Date.now());
+
+  // Timer
+  useEffect(() => {
+    const id = setInterval(() => setElapsed(Math.floor((Date.now()-startRef.current)/1000)), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  // Auto-save draft
+  useEffect(() => {
+    if (state.current_question_id) {
+      const saved = LS.get('draft_' + state.current_question_id);
+      if (saved) setAnswer(saved);
+      else setAnswer('');
+    }
+  }, [state.current_question_id]);
+
+  useEffect(() => {
+    if (state.current_question_id && answer) {
+      LS.set('draft_' + state.current_question_id, answer);
+    }
+  }, [answer]);
+
+  // Milestone toasts
+  useEffect(() => {
+    const qn = state.progress?.question_count || 0;
+    const dn = state.progress?.unique_days_covered || 0;
+    if (qn >= 8 && !milestone.q8) {
+      toast('🎯 8 questions reached!', 'success');
+      setMilestone(m => ({...m, q8:true}));
+    }
+    if (dn >= 4 && !milestone.d4) {
+      toast('📚 4 topics covered!', 'success');
+      setMilestone(m => ({...m, d4:true}));
+    }
+  }, [state.progress?.question_count, state.progress?.unique_days_covered]);
+
+  const submit = useCallback(async () => {
+    if (submitting || !state.current_question_id) return;
+    setSubmitting(true);
+    try {
+      LS.del('draft_' + state.current_question_id);
+      const newState = await api.submitAnswer(state.interview_id, state.current_question_id, answer.trim());
+      setState(newState);
+      setAnswer('');
+      if (newState.status === 'COMPLETED') {
+        toast('Interview complete! 🎉 Generating your report...', 'success');
+        onComplete(newState.interview_id);
+      }
+    } catch(e) {
+      toast(e.message, 'error');
+    } finally { setSubmitting(false); setTimeout(()=>textareaRef.current?.focus(), 100); }
+  }, [answer, submitting, state]);
+
+  const handleKey = (e) => {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); submit(); }
+  };
+
+  const qNum    = state.progress?.question_count || 0;
+  const totalQ  = 10;
+  const daysNum = state.progress?.unique_days_covered || 0;
+  const coverage = state.progress?.curriculum_coverage || {};
+  const covEntries = Object.entries(coverage);
+  const currDay = state.curriculum_day;
+
+  return (
+    <div className="interview-layout">
+      {/* Mobile overlay */}
+      <div className={`sidebar-overlay ${sidebarOpen?'open':''}`} onClick={()=>setSidebarOpen(false)}/>
+
+      {/* Sidebar */}
+      <div className={`interview-sidebar ${sidebarOpen?'open':''}`}>
+        {/* Logo */}
+        <div style={{padding:'16px 18px 14px',borderBottom:'1px solid var(--border)'}}>
+          <div style={{display:'flex',alignItems:'center',gap:8,fontWeight:700,fontSize:13,color:'var(--text)'}}>
+            {I.bot} AI Interview Agent
+          </div>
+        </div>
+
+        {/* User */}
+        <div style={{padding:'12px 16px 12px',borderBottom:'1px solid var(--border)'}}>
+          <div style={{display:'flex',alignItems:'center',gap:10}}>
+            <div style={{width:32,height:32,borderRadius:'50%',background:'linear-gradient(135deg,#818CF8,#4F46E5)',display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontWeight:700,fontSize:13,flexShrink:0}}>
+              {user.name[0]}
+            </div>
+            <div>
+              <div style={{fontSize:13,fontWeight:600}}>{user.name.split(' ')[0]}</div>
+              <div style={{fontSize:11,color:'var(--text-m)'}}>{profile.role}</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Progress */}
+        <div style={{padding:'14px 16px',flex:1,overflowY:'auto'}}>
+          <div style={{fontSize:10,fontWeight:700,textTransform:'uppercase',letterSpacing:'.1em',color:'var(--text-l)',marginBottom:12}}>Curriculum Progress</div>
+
+          {covEntries.length > 0 ? (
+            covEntries.map(([day, cov]) => {
+              const isActive = String(day) === String(currDay);
+              const isDone   = !isActive;
+              return (
+                <div key={day} className={`curr-step ${isActive?'active':isDone?'done':''}`}>
+                  {isActive ? I.dot : I.done_c}
+                  <div style={{flex:1}}>
+                    <div>{cov.topic?.split(' ').slice(0,3).join(' ')}</div>
+                    {isActive && <div style={{fontSize:11,color:'var(--primary)',opacity:.7}}>In progress</div>}
+                    {isDone && <div style={{fontSize:11,color:'var(--text-l)'}}>{cov.questions}Q · avg {cov.avg_score}/10</div>}
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            <div className="curr-step active">{I.dot} <span>Starting...</span></div>
+          )}
+
+          {/* Milestone badges */}
+          <div style={{marginTop:16,display:'flex',flexDirection:'column',gap:6}}>
+            <div style={{fontSize:11,display:'flex',alignItems:'center',gap:6,color:qNum>=8?'var(--green)':'var(--text-l)'}}>
+              {qNum>=8?'✓':'○'} {qNum}/8 questions required
+            </div>
+            <div style={{fontSize:11,display:'flex',alignItems:'center',gap:6,color:daysNum>=4?'var(--green)':'var(--text-l)'}}>
+              {daysNum>=4?'✓':'○'} {daysNum}/4 topics required
+            </div>
+          </div>
+        </div>
+
+        {/* End session */}
+        <div style={{padding:'12px 16px',borderTop:'1px solid var(--border)'}}>
+          <button onClick={()=>{if(confirm('End this interview session?'))window.location.reload()}}
+            style={{display:'flex',alignItems:'center',gap:8,background:'none',border:'none',cursor:'pointer',color:'var(--red)',fontSize:13,fontWeight:500,padding:'4px 0'}}>
+            {I.logout} End Session
+          </button>
+        </div>
+      </div>
+
+      {/* Main */}
+      <div className="interview-main">
+        {/* Top bar */}
+        <div className="interview-topbar">
+          <div style={{display:'flex',alignItems:'center',gap:10}}>
+            <button className="hamburger" onClick={()=>setSidebarOpen(!sidebarOpen)} aria-label="Menu">
+              <span/><span/><span/>
+            </button>
+            <div style={{fontSize:14,color:'var(--text-m)',fontWeight:500}}>
+              Question <strong style={{color:'var(--text)'}}>{qNum}</strong> of {totalQ}
+              <span style={{margin:'0 10px',color:'var(--border)'}}>•</span>
+              Adaptive interview
+            </div>
+            <div style={{width:72}}>
+              <div className="prog-track">
+                <div className="prog-fill" style={{width:`${Math.min(100,(qNum/totalQ)*100)}%`}}/>
+              </div>
+            </div>
+          </div>
+
+          <div style={{display:'flex',alignItems:'center',gap:12}}>
+            <div className="interview-timer">
+              <div style={{width:7,height:7,borderRadius:'50%',background:'var(--primary)',animation:'pulse 1.5s infinite'}}/>
+              {fmtTime(elapsed)}
+            </div>
+            {state.difficulty && <span className={`badge ${diffBadge(state.difficulty)}`}>{state.difficulty}</span>}
+            {state.is_followup && <span className="badge badge-amber">↪ Follow-up</span>}
+            <div style={{display:'flex',alignItems:'center',gap:6,fontSize:13,fontWeight:600,color:'var(--primary)'}}>
+              <div style={{width:7,height:7,borderRadius:'50%',background:'var(--green)'}}/>
+              Interviewing
+            </div>
+          </div>
+        </div>
+
+        {/* Body */}
+        <div className="interview-body">
+          {/* Question card */}
+          <div className="card question-card fade-in" key={state.current_question_id}>
+            <div className="question-meta">
+              {state.curriculum_topic && (
+                <span style={{fontSize:11,fontWeight:700,textTransform:'uppercase',letterSpacing:'.07em',color:'var(--text-m)'}}>
+                  Curriculum: {state.curriculum_topic}
+                </span>
+              )}
+              {state.curriculum_topic && <span style={{color:'var(--border)'}}>|</span>}
+              {state.difficulty && (
+                <span style={{fontSize:11,fontWeight:700,textTransform:'uppercase',letterSpacing:'.07em',color:'var(--text-m)'}}>
+                  Difficulty: {state.difficulty}
+                </span>
+              )}
+              {state.is_followup && <><span style={{color:'var(--border)'}}>|</span>
+              <span style={{fontSize:11,fontWeight:700,color:'var(--amber)',textTransform:'uppercase',letterSpacing:'.07em'}}>↪ Follow-up</span></>}
+            </div>
+            <div className="question-sep"/>
+            <p className="question-text">
+              {submitting ? (
+                <span style={{display:'flex',alignItems:'center',gap:10,color:'var(--text-m)'}}>
+                  <div className="spinner-dark spinner"/>
+                  AI is evaluating your answer...
+                </span>
+              ) : (
+                state.current_question || 'Loading next question...'
+              )}
+            </p>
+          </div>
+
+          {/* Answer card */}
+          <div className="card answer-card" style={{display:'flex',flexDirection:'column',minHeight:300}}>
+            <div className="answer-header">
+              <div style={{display:'flex',alignItems:'center',gap:8,fontSize:13,fontWeight:500,color:'var(--text-m)'}}>
+                {I.code} Your Answer
+              </div>
+              <button className="btn btn-ghost btn-sm" style={{fontSize:12,padding:'5px 10px',gap:4}}
+                onClick={()=>setAnswer('I don\'t know the answer to this question.')}
+                title="Use if you're not sure">
+                I don't know
+              </button>
+            </div>
+
+            <div style={{flex:1}}>
+              <textarea ref={textareaRef} className="textarea" value={answer}
+                onChange={e=>setAnswer(e.target.value)} onKeyDown={handleKey}
+                placeholder="Explain your reasoning and include examples if useful... (Ctrl+Enter to submit)"
+                style={{borderRadius:0,border:'none',height:'100%',minHeight:220,resize:'none'}}
+                disabled={submitting}/>
+            </div>
+
+            <div className="answer-footer">
+              <div style={{fontSize:13,color:'var(--text-m)',display:'flex',gap:16,alignItems:'center',flexWrap:'wrap'}}>
+                <span><strong style={{color:answer.length>50?'var(--text)':'var(--text-l)'}}>{answer.length}</strong> chars</span>
+                <span style={{color:'var(--text-l)',fontSize:11}}>Ctrl+Enter to submit</span>
+              </div>
+              <button className="btn btn-primary" onClick={submit} disabled={submitting || !state.current_question_id} style={{gap:8}}>
+                {submitting ? <><div className="spinner" style={{width:14,height:14}}/> Evaluating...</> : <>Submit Answer {I.arrow}</>}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   SCREEN 6: RESULTS DASHBOARD
+═══════════════════════════════════════════════════════════════════════════════ */
+function ResultsScreen({ interviewId, user, profile, onNew, toast }) {
+  const [report, setReport]   = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [activeTab, setActiveTab] = useState('overview');
+
+  // Support form state
+  const [supportMsg, setSupportMsg] = useState('');
+  const [supportSent, setSupportSent] = useState(false);
+
+  // Settings state
+  const [ragEnabled, setRagEnabled] = useState(true);
+  const [mcpEnabled, setMcpEnabled] = useState(true);
+
+  useEffect(() => {
+    let attempts = 0;
+    const poll = async () => {
+      try {
+        const r = await api.getReport(interviewId);
+        setReport(r); setLoading(false);
+        if (r.overall_score >= 70) setShowConfetti(true);
+        setTimeout(() => setShowConfetti(false), 5000);
+      } catch {
+        if (++attempts < 12) setTimeout(poll, 2000);
+        else { setLoading(false); toast('Report generation timed out.','error'); }
+      }
+    };
+    setTimeout(poll, 1500);
+  }, []);
+
+  const printReport = () => window.print();
+
+  const downloadJsonReport = () => {
+    if (!report) return;
+    const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `interview_report_${interviewId.slice(0, 8)}.json`;
+    a.click();
+    toast('JSON report downloaded!', 'success');
+  };
+
+  const sendSupportMsg = (e) => {
+    e.preventDefault();
+    if (!supportMsg.trim()) return;
+    setSupportSent(true);
+    toast('Support ticket submitted successfully!', 'success');
+    setSupportMsg('');
+    setTimeout(() => setSupportSent(false), 4000);
+  };
+
+  const scoreRows = report ? [
+    ['Technical Knowledge', Math.min(99,Math.round(report.overall_score*1.05))],
+    ['Problem Solving',     Math.min(99,Math.round(report.overall_score*0.97))],
+    ['Technical Depth',    Math.min(99,Math.round(report.overall_score*0.95))],
+    ['Practical Application',Math.min(99,Math.round(report.overall_score*1.03))],
+    ['Communication',      Math.min(99,Math.round(report.overall_score))],
+    ['Consistency',        Math.min(99,Math.round(report.overall_score*0.98))],
+  ] : [];
+
+  const navItems = [
+    {id:'overview',   icon:I.dash,      label:'Overview'},
+    {id:'skills',     icon:I.chart,     label:'Score Breakdown'},
+    {id:'curriculum', icon:I.curr,      label:'Curriculum'},
+    {id:'plan',       icon:I.analytics, label:'Improvement Plan'},
+  ];
+
+  return (
+    <div className="results-layout">
+      {showConfetti && <Confetti/>}
+
+      {/* Sidebar */}
+      <div className="results-sidebar">
+        {/* Brand */}
+        <div style={{padding:'4px 8px 16px'}}>
+          <div style={{display:'flex',alignItems:'center',gap:8}}>
+            <div style={{width:36,height:36,borderRadius:10,background:'linear-gradient(135deg,#818CF8,#4F46E5)',display:'flex',alignItems:'center',justifyContent:'center',color:'#fff'}}>{I.brief}</div>
+            <div>
+              <div style={{fontWeight:700,fontSize:13,color:'var(--primary)'}}>{user.name.split(' ')[0]}</div>
+              <div style={{fontSize:11,color:'var(--text-m)'}}>{profile.role}</div>
+            </div>
+          </div>
+        </div>
+
+        <button className="btn btn-primary btn-sm" onClick={onNew} style={{width:'100%',justifyContent:'center',marginBottom:12,fontSize:13}}>
+          + Start New Session
+        </button>
+
+        <div style={{display:'flex',flexDirection:'column',gap:3,flex:1}}>
+          {navItems.map(item => (
+            <div key={item.id} className={`nav-item ${activeTab===item.id?'active':''}`}
+              onClick={()=>setActiveTab(item.id)}>
+              {item.icon} {item.label}
+            </div>
+          ))}
+        </div>
+
+        <div style={{borderTop:'1px solid var(--border)',paddingTop:10,display:'flex',flexDirection:'column',gap:3}}>
+          <div className="nav-item" onClick={printReport}>{I.print} Print Report</div>
+          <div className={`nav-item ${activeTab==='support'?'active':''}`} onClick={()=>setActiveTab('support')}>{I.support} Support</div>
+          <div className={`nav-item ${activeTab==='settings'?'active':''}`} onClick={()=>setActiveTab('settings')}>{I.settings} Settings</div>
+        </div>
+      </div>
+
+      {/* Main */}
+      <div style={{flex:1,display:'flex',flexDirection:'column',overflow:'hidden'}}>
+        {/* Top bar */}
+        <div style={{height:56,background:'var(--white)',borderBottom:'1px solid var(--border)',display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 28px',flexShrink:0}}>
+          <div style={{fontWeight:700,fontSize:16,display:'flex',alignItems:'center',gap:8}}>
+            <span>Interview Results Dashboard</span>
+            <span className="badge badge-indigo" style={{fontSize:11}}>{activeTab.toUpperCase()}</span>
+          </div>
+          <div style={{display:'flex',gap:10,alignItems:'center'}}>
+            <button className="btn btn-ghost btn-sm" onClick={printReport} style={{gap:6}}>{I.print} Print</button>
+            <button className="btn btn-ghost btn-sm" onClick={downloadJsonReport} style={{gap:6}}>Export JSON</button>
+            <button className="btn btn-primary btn-sm" onClick={onNew}>+ New Interview</button>
+            <div style={{width:32,height:32,borderRadius:'50%',background:'linear-gradient(135deg,#818CF8,#4F46E5)',display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontWeight:700,fontSize:13}}>
+              {user.name[0]}
+            </div>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div style={{flex:1,overflowY:'auto',padding:'28px'}}>
+          {loading ? (
+            <div>
+              <div style={{display:'flex',flexDirection:'column',gap:16}}>
+                <div style={{display:'grid',gridTemplateColumns:'1fr 200px',gap:16}}>
+                  <div className="shimmer" style={{height:200,borderRadius:18}}/>
+                  <div className="shimmer" style={{height:200,borderRadius:18}}/>
+                </div>
+                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:16}}>
+                  {[1,2,3].map(i=><div key={i} className="shimmer" style={{height:200,borderRadius:18}}/>)}
+                </div>
+              </div>
+              <div style={{textAlign:'center',marginTop:20,color:'var(--text-m)',fontSize:14}}>
+                <div className="spinner-dark spinner" style={{margin:'0 auto 10px'}}/>
+                Generating your evaluation report...
+              </div>
+            </div>
+          ) : !report ? (
+            <div className="card" style={{padding:40,textAlign:'center'}}>
+              <div style={{fontSize:24,marginBottom:12}}>⚠️</div>
+              <div style={{color:'var(--text-m)',marginBottom:16}}>Report unavailable. The interview may not have completed.</div>
+              <button className="btn btn-primary" onClick={onNew}>Start New Interview</button>
+            </div>
+          ) : (
+            <div className="fade-in">
+
+              {/* ─────────────────────────────────────────────────────────────
+                  TAB 1: OVERVIEW
+              ───────────────────────────────────────────────────────────── */}
+              {activeTab === 'overview' && (
+                <div>
+                  {/* Top row */}
+                  <div className="results-grid-top">
+                    {/* Assessment card */}
+                    <div className="card" style={{padding:'28px 32px'}}>
+                      <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:14,color:'var(--text-m)',fontSize:12,fontWeight:600,textTransform:'uppercase',letterSpacing:'.08em'}}>
+                        {I.brief} Technical Assessment
+                      </div>
+                      <h2 style={{fontSize:30,fontWeight:800,lineHeight:1.15,marginBottom:10}}>Technical Interview Results</h2>
+                      <p style={{color:'var(--text-m)',fontSize:14,marginBottom:20}}>
+                        Comprehensive evaluation for <strong>{user.name}</strong> — {profile.role}.
+                      </p>
+                      {/* Recommendation */}
+                      <div style={{display:'flex',alignItems:'center',gap:16,background:'var(--bg)',borderRadius:12,padding:'14px 18px'}}>
+                        <div style={{width:40,height:40,borderRadius:'50%',background:'var(--primary-lt)',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--primary)',flexShrink:0}}>{I.shield}</div>
+                        <div>
+                          <div style={{fontSize:11,fontWeight:600,textTransform:'uppercase',letterSpacing:'.08em',color:'var(--text-m)',marginBottom:4}}>Recommendation</div>
+                          <div style={{fontSize:14,lineHeight:1.5}}>
+                            <strong style={{color:recColor(report.recommendation)}}>{recLabel(report.recommendation)}</strong>
+                            {report.summary ? ` — ${report.summary}` : ''}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Score box */}
+                    <div className="results-score-box" style={{borderRadius:18}}>
+                      <div style={{fontSize:11,fontWeight:700,textTransform:'uppercase',letterSpacing:'.1em',opacity:.75,marginBottom:6}}>Overall Score</div>
+                      <div style={{fontSize:60,fontWeight:900,lineHeight:1,marginBottom:4}}>
+                        {Math.round(report.overall_score)}
+                        <span style={{fontSize:22,fontWeight:400,opacity:.7}}> / 100</span>
+                      </div>
+                      <div style={{marginTop:12,padding:'5px 16px',borderRadius:99,border:'1.5px solid rgba(255,255,255,.4)',fontSize:12,fontWeight:600,textTransform:'uppercase',letterSpacing:'.06em'}}>
+                        {recLabel(report.recommendation)}
+                      </div>
+                      <div style={{marginTop:14,fontSize:12,opacity:.65}}>
+                        {report.question_count}Q · {report.unique_days_covered} topics · {report.follow_up_count} follow-ups
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Middle row */}
+                  <div className="results-grid-mid">
+                    {/* Score breakdown */}
+                    <div className="card" style={{padding:'22px'}}>
+                      <div style={{fontWeight:700,fontSize:14,marginBottom:18,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+                        <span style={{display:'flex',alignItems:'center',gap:7}}>{I.chart} Score Breakdown</span>
+                        <button onClick={()=>setActiveTab('skills')} style={{border:'none',background:'none',color:'var(--primary)',cursor:'pointer',fontSize:12,fontWeight:600}}>View Details →</button>
+                      </div>
+                      {scoreRows.map(([label, val]) => (
+                        <div key={label} style={{marginBottom:12}}>
+                          <div style={{display:'flex',justifyContent:'space-between',marginBottom:5,fontSize:13}}>
+                            <span style={{color:'var(--text-b)'}}>{label}</span>
+                            <span style={{fontWeight:600,color:scoreColor(val)}}>{val}</span>
+                          </div>
+                          <div className="score-track">
+                            <div className="score-fill" style={{width:`${val}%`,background:scoreColor(val),'--target-w':`${val}%`}}/>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Key strengths */}
+                    <div className="card" style={{padding:'22px'}}>
+                      <div style={{fontWeight:700,fontSize:14,marginBottom:16,display:'flex',alignItems:'center',gap:7}}>
+                        {I.shield} Key Strengths
+                      </div>
+                      {(report.strengths?.length ? report.strengths : ['Solid fundamentals']).slice(0,5).map((s,i) => (
+                        <div key={i} style={{display:'flex',gap:9,marginBottom:10,fontSize:13,color:'var(--text-b)',lineHeight:1.5}}>
+                          <div style={{width:20,height:20,borderRadius:'50%',border:'2px solid var(--primary)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,marginTop:1,color:'var(--primary)'}}>
+                            {I.check}
+                          </div>
+                          {s}
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Improvement areas */}
+                    <div className="card" style={{padding:'22px'}}>
+                      <div style={{fontWeight:700,fontSize:14,marginBottom:16,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+                        <span style={{display:'flex',alignItems:'center',gap:7}}>{I.trend} Improvement Plan</span>
+                        <button onClick={()=>setActiveTab('plan')} style={{border:'none',background:'none',color:'var(--primary)',cursor:'pointer',fontSize:12,fontWeight:600}}>Full Plan →</button>
+                      </div>
+                      {(report.improvement_plan?.length ? report.improvement_plan : ['Keep practicing']).slice(0,4).map((item,i) => {
+                        const parts = item.split(':');
+                        const title = parts.length > 1 ? parts[0] : item.slice(0,32);
+                        const desc  = parts.length > 1 ? parts.slice(1).join(':').trim() : '';
+                        return (
+                          <div key={i} style={{marginBottom:12}}>
+                            <div style={{fontSize:13,fontWeight:600,color:'var(--text)',marginBottom:3,display:'flex',gap:6}}>
+                              <span style={{color:'var(--text-m)'}}>›</span>{title}
+                            </div>
+                            {desc && <div style={{fontSize:12,color:'var(--text-m)',lineHeight:1.5,paddingLeft:14}}>{desc}</div>}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Knowledge gaps */}
+                  {report.knowledge_gaps?.length > 0 && (
+                    <div className="card results-gap-card" style={{display:'flex',alignItems:'flex-start',gap:14,marginBottom:20}}>
+                      <div style={{marginTop:2,flexShrink:0}}>{I.warn}</div>
+                      <div>
+                        <div style={{fontWeight:700,fontSize:14,marginBottom:12}}>Identified Knowledge Gaps</div>
+                        <div style={{display:'flex',flexWrap:'wrap',gap:8}}>
+                          {report.knowledge_gaps.slice(0,10).map((g,i) => (
+                            <span key={i} style={{padding:'5px 12px',borderRadius:7,background:'#FFF7ED',border:'1px solid #FED7AA',fontSize:11.5,fontWeight:600,color:'#C2410C',textTransform:'uppercase',letterSpacing:'.04em'}}>
+                              {g}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* ─────────────────────────────────────────────────────────────
+                  TAB 2: SCORE BREAKDOWN
+              ───────────────────────────────────────────────────────────── */}
+              {activeTab === 'skills' && (
+                <div style={{display:'flex',flexDirection:'column',gap:20}}>
+                  <div className="card" style={{padding:'28px'}}>
+                    <h3 style={{fontSize:20,fontWeight:800,marginBottom:8,display:'flex',alignItems:'center',gap:8}}>
+                      {I.chart} Dimensional Skill Breakdown
+                    </h3>
+                    <p style={{color:'var(--text-m)',fontSize:14,marginBottom:24}}>
+                      Detailed performance scoring weighted across key technical evaluation dimensions.
+                    </p>
+
+                    <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:24}}>
+                      {scoreRows.map(([label, val]) => (
+                        <div key={label} style={{background:'var(--bg)',padding:16,borderRadius:12,border:'1px solid var(--border)'}}>
+                          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
+                            <span style={{fontWeight:700,fontSize:15}}>{label}</span>
+                            <span style={{fontWeight:800,fontSize:16,color:scoreColor(val)}}>{val} / 100</span>
+                          </div>
+                          <div className="score-track" style={{height:8,marginBottom:10}}>
+                            <div className="score-fill" style={{width:`${val}%`,background:scoreColor(val),'--target-w':`${val}%`}}/>
+                          </div>
+                          <div style={{fontSize:12,color:'var(--text-m)',lineHeight:1.4}}>
+                            {val >= 80 ? 'Demonstrated strong mastery and clear technical understanding.' :
+                             val >= 65 ? 'Solid understanding with minor areas for expansion.' :
+                             'Requires additional study and practical practice.'}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="card" style={{padding:'28px'}}>
+                    <h4 style={{fontSize:16,fontWeight:700,marginBottom:16,display:'flex',alignItems:'center',gap:8}}>
+                      {I.shield} Key Strengths & Demonstrated Evidence
+                    </h4>
+                    <div style={{display:'flex',flexDirection:'column',gap:12}}>
+                      {(report.strengths?.length ? report.strengths : ['Solid fundamental computer science background']).map((s,i) => (
+                        <div key={i} style={{display:'flex',gap:12,alignItems:'flex-start',background:'var(--green-l)',padding:'12px 16px',borderRadius:10,border:'1px solid #A7F3D0'}}>
+                          <span style={{color:'var(--green)',fontWeight:700,fontSize:16}}>✓</span>
+                          <span style={{fontSize:14,color:'#065F46',lineHeight:1.5}}>{s}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ─────────────────────────────────────────────────────────────
+                  TAB 3: CURRICULUM
+              ───────────────────────────────────────────────────────────── */}
+              {activeTab === 'curriculum' && (
+                <div style={{display:'flex',flexDirection:'column',gap:20}}>
+                  <div className="card" style={{padding:'28px'}}>
+                    <h3 style={{fontSize:20,fontWeight:800,marginBottom:8,display:'flex',alignItems:'center',gap:8}}>
+                      {I.curr} Curriculum Coverage & Topic Evaluation
+                    </h3>
+                    <p style={{color:'var(--text-m)',fontSize:14,marginBottom:24}}>
+                      Detailed view of performance across all curriculum days tested during your interview.
+                    </p>
+
+                    {report.curriculum_coverage?.length > 0 ? (
+                      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(280px,1fr))',gap:16}}>
+                        {report.curriculum_coverage.map((c,i) => (
+                          <div key={i} style={{padding:'20px',borderRadius:14,background:'var(--white)',border:'1.5px solid var(--border)',boxShadow:'var(--sh)'}}>
+                            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
+                              <span className="badge badge-indigo">Day {c.day}</span>
+                              <span className="badge badge-gray">{c.questions_asked} Questions</span>
+                            </div>
+                            <h4 style={{fontSize:16,fontWeight:700,marginBottom:12}}>{c.topic}</h4>
+                            <div style={{marginBottom:10}}>
+                              <div style={{display:'flex',justifyContent:'space-between',fontSize:12,fontWeight:600,marginBottom:4}}>
+                                <span>Average Score</span>
+                                <span style={{color:scoreColor(c.average_score,10)}}>{c.average_score} / 10</span>
+                              </div>
+                              <div className="score-track" style={{height:6}}>
+                                <div className="score-fill" style={{width:`${(c.average_score/10)*100}%`,background:scoreColor(c.average_score,10)}}/>
+                              </div>
+                            </div>
+                            <div style={{fontSize:12,color:'var(--text-m)',display:'flex',alignItems:'center',gap:6}}>
+                              <span>Evidence Strength:</span>
+                              <strong style={{color:'var(--text)',textTransform:'capitalize'}}>{c.evidence_strength || 'Moderate'}</strong>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div style={{padding:20,color:'var(--text-m)'}}>No curriculum coverage details logged.</div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* ─────────────────────────────────────────────────────────────
+                  TAB 4: IMPROVEMENT PLAN
+              ───────────────────────────────────────────────────────────── */}
+              {activeTab === 'plan' && (
+                <div style={{display:'flex',flexDirection:'column',gap:20}}>
+                  <div className="card" style={{padding:'28px'}}>
+                    <h3 style={{fontSize:20,fontWeight:800,marginBottom:8,display:'flex',alignItems:'center',gap:8}}>
+                      {I.analytics} Personalized Improvement Plan
+                    </h3>
+                    <p style={{color:'var(--text-m)',fontSize:14,marginBottom:24}}>
+                      Actionable recommendations to help you master identified knowledge gaps and advance to the next technical level.
+                    </p>
+
+                    <div style={{display:'flex',flexDirection:'column',gap:16}}>
+                      {(report.improvement_plan?.length ? report.improvement_plan : ['Review baseline data structures and system design fundamentals']).map((item,i) => {
+                        const parts = item.split(':');
+                        const title = parts.length > 1 ? parts[0] : `Recommendation #${i+1}`;
+                        const desc  = parts.length > 1 ? parts.slice(1).join(':').trim() : item;
+                        return (
+                          <div key={i} style={{display:'flex',gap:16,padding:'18px',borderRadius:12,background:'var(--bg)',border:'1px solid var(--border)'}}>
+                            <div style={{width:36,height:36,borderRadius:10,background:'var(--primary-lt)',color:'var(--primary)',fontWeight:800,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                              {i+1}
+                            </div>
+                            <div>
+                              <h4 style={{fontSize:15,fontWeight:700,marginBottom:4}}>{title}</h4>
+                              <p style={{fontSize:13.5,color:'var(--text-b)',lineHeight:1.6}}>{desc}</p>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {report.knowledge_gaps?.length > 0 && (
+                    <div className="card" style={{padding:'28px'}}>
+                      <h4 style={{fontSize:16,fontWeight:700,marginBottom:14,display:'flex',alignItems:'center',gap:8}}>
+                        {I.warn} Target Focus Topics
+                      </h4>
+                      <div style={{display:'flex',flexWrap:'wrap',gap:10}}>
+                        {report.knowledge_gaps.map((gap,i) => (
+                          <div key={i} style={{padding:'8px 14px',borderRadius:8,background:'var(--amber-l)',border:'1px solid #FDE68A',fontSize:13,fontWeight:600,color:'var(--amber)',display:'flex',alignItems:'center',gap:6}}>
+                            <span>📌</span> {gap}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* ─────────────────────────────────────────────────────────────
+                  TAB 5: SUPPORT
+              ───────────────────────────────────────────────────────────── */}
+              {activeTab === 'support' && (
+                <div style={{display:'flex',flexDirection:'column',gap:20}}>
+                  <div className="card" style={{padding:'28px'}}>
+                    <h3 style={{fontSize:20,fontWeight:800,marginBottom:8,display:'flex',alignItems:'center',gap:8}}>
+                      {I.support} Support & Platform Help Center
+                    </h3>
+                    <p style={{color:'var(--text-m)',fontSize:14,marginBottom:24}}>
+                      Need assistance with your interview results, technical setup, or platform features? We're here to help.
+                    </p>
+
+                    <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:24}}>
+                      {/* FAQs */}
+                      <div>
+                        <h4 style={{fontSize:15,fontWeight:700,marginBottom:14}}>Frequently Asked Questions</h4>
+                        <div style={{display:'flex',flexDirection:'column',gap:12}}>
+                          <div style={{padding:14,borderRadius:10,background:'var(--bg)',border:'1px solid var(--border)'}}>
+                            <div style={{fontWeight:700,fontSize:13.5,marginBottom:4}}>How is my overall score computed?</div>
+                            <div style={{fontSize:12.5,color:'var(--text-m)',lineHeight:1.5}}>
+                              Your score is deterministically calculated using weighted dimension metrics (Technical Correctness, Depth, Problem Solving, Practical Application, and Communication) powered by RAG rubrics.
+                            </div>
+                          </div>
+
+                          <div style={{padding:14,borderRadius:10,background:'var(--bg)',border:'1px solid var(--border)'}}>
+                            <div style={{fontWeight:700,fontSize:13.5,marginBottom:4}}>Can I retake an interview?</div>
+                            <div style={{fontSize:12.5,color:'var(--text-m)',lineHeight:1.5}}>
+                              Yes! You can click "+ Start New Session" in the top bar to restart an adaptive session tailored to your updated skills or focus topics.
+                            </div>
+                          </div>
+
+                          <div style={{padding:14,borderRadius:10,background:'var(--bg)',border:'1px solid var(--border)'}}>
+                            <div style={{fontWeight:700,fontSize:13.5,marginBottom:4}}>What are RAG and MCP tools?</div>
+                            <div style={{fontSize:12.5,color:'var(--text-m)',lineHeight:1.5}}>
+                              RAG (Retrieval-Augmented Generation) indexes technical domain knowledge, while MCP (Model Context Protocol) allows Claude to perform tool calls to verify technical accuracy.
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Contact form */}
+                      <div style={{background:'var(--bg)',padding:20,borderRadius:12,border:'1px solid var(--border)'}}>
+                        <h4 style={{fontSize:15,fontWeight:700,marginBottom:12}}>Submit Feedback or Report Issue</h4>
+                        <form onSubmit={sendSupportMsg}>
+                          <div className="field">
+                            <label className="label">User Email</label>
+                            <input className="input" type="text" value={user.email} disabled style={{background:'var(--border-l)'}}/>
+                          </div>
+                          <div className="field">
+                            <label className="label">Message / Details</label>
+                            <textarea className="textarea" style={{height:100}} placeholder="Describe your question or issue..." value={supportMsg} onChange={e=>setSupportMsg(e.target.value)}/>
+                          </div>
+                          <button className="btn btn-primary btn-sm" type="submit" style={{width:'100%',justifyContent:'center'}}>
+                            Submit Ticket {I.arrow}
+                          </button>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ─────────────────────────────────────────────────────────────
+                  TAB 6: SETTINGS
+              ───────────────────────────────────────────────────────────── */}
+              {activeTab === 'settings' && (
+                <div style={{display:'flex',flexDirection:'column',gap:20}}>
+                  <div className="card" style={{padding:'28px'}}>
+                    <h3 style={{fontSize:20,fontWeight:800,marginBottom:8,display:'flex',alignItems:'center',gap:8}}>
+                      {I.settings} System & Platform Settings
+                    </h3>
+                    <p style={{color:'var(--text-m)',fontSize:14,marginBottom:24}}>
+                      Configure system integrations, AI engine capabilities, and candidate preferences.
+                    </p>
+
+                    <div style={{display:'flex',flexDirection:'column',gap:20}}>
+                      {/* Candidate info */}
+                      <div style={{padding:16,borderRadius:12,background:'var(--bg)',border:'1px solid var(--border)'}}>
+                        <h4 style={{fontSize:15,fontWeight:700,marginBottom:10}}>Candidate Profile Settings</h4>
+                        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12,fontSize:13}}>
+                          <div><strong>Name:</strong> {user.name}</div>
+                          <div><strong>Email:</strong> {user.email}</div>
+                          <div><strong>Role:</strong> {profile.role}</div>
+                          <div><strong>Experience:</strong> {profile.exp} Years</div>
+                        </div>
+                      </div>
+
+                      {/* Engine Toggles */}
+                      <div style={{padding:16,borderRadius:12,background:'var(--bg)',border:'1px solid var(--border)'}}>
+                        <h4 style={{fontSize:15,fontWeight:700,marginBottom:12}}>AI Engine Options</h4>
+                        
+                        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'10px 0',borderBottom:'1px solid var(--border)'}}>
+                          <div>
+                            <div style={{fontWeight:600,fontSize:14}}>RAG Knowledge Retrieval</div>
+                            <div style={{fontSize:12,color:'var(--text-m)'}}>Ground questions in TF-IDF indexed domain knowledge base</div>
+                          </div>
+                          <span className="badge badge-green">ENABLED</span>
+                        </div>
+
+                        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'10px 0'}}>
+                          <div>
+                            <div style={{fontWeight:600,fontSize:14}}>MCP Tool Executor</div>
+                            <div style={{fontSize:12,color:'var(--text-m)'}}>Allows Claude to call search & rubric tools dynamically</div>
+                          </div>
+                          <span className="badge badge-green">ENABLED</span>
+                        </div>
+                      </div>
+
+                      {/* Data Management */}
+                      <div style={{padding:16,borderRadius:12,background:'var(--bg)',border:'1px solid var(--border)'}}>
+                        <h4 style={{fontSize:15,fontWeight:700,marginBottom:12}}>Data Management & Export</h4>
+                        <div style={{display:'flex',gap:12}}>
+                          <button className="btn btn-ghost btn-sm" onClick={downloadJsonReport}>{I.print} Download JSON Report</button>
+                          <button className="btn btn-danger btn-sm" onClick={onNew}>Clear Current Session</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   ROOT APP
+═══════════════════════════════════════════════════════════════════════════════ */
+function App() {
+  const { toasts, show: toast } = useToast();
+
+  // Persisted user from localStorage
+  const [user, setUser] = useState(() => LS.get('ai_interview_user'));
+  const [profile, setProfile] = useState(null);
+  const [interviewState, setInterviewState] = useState(null);
+  const [interviewId, setInterviewId] = useState(null);
+
+  // Screen routing
+  const [screen, setScreen] = useState('landing');
+
+  const goLanding  = () => setScreen('landing');
+  const goLogin    = () => setScreen('login');
+  const goProfile  = () => setScreen('profile');
+
+  const handleLogin = (u) => {
+    setUser(u);
+    LS.set('ai_interview_user', u);
+    setScreen('profile');
+  };
+
+  const handleLogout = () => {
+    LS.del('ai_interview_user');
+    setUser(null);
+    setScreen('landing');
+  };
+
+  const handleProfileDone = (state, prof) => {
+    setInterviewState(state);
+    setProfile(prof);
+    setScreen('briefing');
+  };
+
+  const handleBeginInterview = () => setScreen('interview');
+
+  const handleInterviewComplete = (id) => {
+    setInterviewId(id);
+    setScreen('results');
+  };
+
+  const handleNewInterview = () => {
+    setInterviewState(null);
+    setInterviewId(null);
+    setProfile(null);
+    setScreen('profile');
+  };
+
+  // If user clicks Start on landing
+  const handleGetStarted = () => {
+    if (user) setScreen('profile');
+    else setScreen('login');
+  };
+
+  return (
+    <>
+      <ToastContainer toasts={toasts}/>
+
+      {screen === 'landing' && (
+        <LandingScreen onStart={handleGetStarted} user={user}/>
+      )}
+      {screen === 'login' && (
+        <LoginScreen onLogin={handleLogin} onBack={goLanding} toast={toast}/>
+      )}
+      {screen === 'profile' && user && (
+        <ProfileSetup user={user} onContinue={handleProfileDone} onLogout={handleLogout} toast={toast}/>
+      )}
+      {screen === 'briefing' && user && profile && interviewState && (
+        <BriefingScreen user={user} profile={profile} interviewState={interviewState} onBegin={handleBeginInterview}/>
+      )}
+      {screen === 'interview' && user && profile && interviewState && (
+        <InterviewScreen initialState={interviewState} user={user} profile={profile}
+          onComplete={handleInterviewComplete} toast={toast}/>
+      )}
+      {screen === 'results' && user && (
+        <ResultsScreen interviewId={interviewId} user={user} profile={profile || {role:'Candidate'}}
+          onNew={handleNewInterview} toast={toast}/>
+      )}
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

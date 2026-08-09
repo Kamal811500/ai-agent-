@@ -1,0 +1,12 @@
+services:
+  interview-agent:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - DEBUG=false
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./backend/data:/app/backend/data:ro
+    restart: unless-stopped

@@ -1,0 +1,206 @@
+[
+  {
+    "day": 1,
+    "title": "Python Fundamentals & Data Structures",
+    "topics": ["variables", "lists", "dicts", "sets", "tuples", "list comprehensions", "generators", "iterators"],
+    "subtopics": {
+      "data_structures": "Arrays, linked lists, stacks, queues, hash tables, trees",
+      "complexity": "Big-O notation, time/space complexity analysis",
+      "python_specifics": "GIL, memory management, mutable vs immutable types"
+    },
+    "difficulty_range": ["easy", "medium"],
+    "question_seeds": [
+      "Explain the difference between a list and a tuple in Python and when you would choose one over the other.",
+      "How does Python's dictionary handle hash collisions?",
+      "Write a generator function that yields Fibonacci numbers. What are the memory benefits over a list?"
+    ],
+    "evaluation_criteria": ["correctness", "depth", "practical_application"]
+  },
+  {
+    "day": 2,
+    "title": "Object-Oriented Programming & Design Patterns",
+    "topics": ["classes", "inheritance", "polymorphism", "encapsulation", "abstract classes", "metaclasses", "design patterns"],
+    "subtopics": {
+      "solid_principles": "Single responsibility, Open/closed, Liskov substitution, Interface segregation, Dependency inversion",
+      "design_patterns": "Singleton, Factory, Observer, Strategy, Decorator",
+      "python_oop": "MRO, __init__, __repr__, __str__, __slots__, dataclasses"
+    },
+    "difficulty_range": ["medium", "hard"],
+    "question_seeds": [
+      "Explain the Liskov Substitution Principle with a concrete example of how violating it causes bugs.",
+      "When would you use composition over inheritance? Give a real-world scenario.",
+      "Implement the Observer pattern in Python without using any external library."
+    ],
+    "evaluation_criteria": ["correctness", "depth", "problem_solving"]
+  },
+  {
+    "day": 3,
+    "title": "Algorithms & Problem Solving",
+    "topics": ["sorting", "searching", "dynamic programming", "recursion", "graph traversal", "greedy algorithms"],
+    "subtopics": {
+      "sorting": "QuickSort, MergeSort, HeapSort — trade-offs and use cases",
+      "graph_algorithms": "BFS, DFS, Dijkstra, Topological sort",
+      "dp": "Memoization vs tabulation, overlapping subproblems, optimal substructure"
+    },
+    "difficulty_range": ["medium", "hard", "expert"],
+    "question_seeds": [
+      "You have a large dataset that barely fits in memory. Which sorting algorithm would you choose and why?",
+      "Explain dynamic programming using the coin change problem. When does a greedy approach fail here?",
+      "Given a directed graph with millions of nodes, how would you detect cycles efficiently?"
+    ],
+    "evaluation_criteria": ["problem_solving", "technical_depth", "correctness"]
+  },
+  {
+    "day": 4,
+    "title": "Databases & SQL",
+    "topics": ["SQL", "indexing", "normalization", "transactions", "ACID", "joins", "query optimization", "NoSQL"],
+    "subtopics": {
+      "indexing": "B-tree, hash indexes, composite indexes, covering indexes, index trade-offs",
+      "transactions": "ACID properties, isolation levels, deadlocks, optimistic vs pessimistic locking",
+      "query_optimization": "EXPLAIN/ANALYZE, query plans, N+1 problem, connection pooling"
+    },
+    "difficulty_range": ["medium", "hard"],
+    "question_seeds": [
+      "A query on a 10M-row users table filtering by email is slow. Walk me through how you'd investigate and fix it.",
+      "Explain the difference between READ COMMITTED and REPEATABLE READ isolation levels with concrete examples.",
+      "When would you choose a NoSQL database over PostgreSQL? What are the trade-offs?"
+    ],
+    "evaluation_criteria": ["correctness", "practical_application", "technical_depth"]
+  },
+  {
+    "day": 5,
+    "title": "APIs & Backend Engineering",
+    "topics": ["REST", "HTTP", "authentication", "rate limiting", "caching", "WebSockets", "microservices"],
+    "subtopics": {
+      "rest_design": "Resource naming, HTTP methods, status codes, idempotency, versioning",
+      "auth": "JWT, OAuth2, API keys, session management, token refresh",
+      "performance": "Caching strategies, CDN, pagination, response compression"
+    },
+    "difficulty_range": ["easy", "medium", "hard"],
+    "question_seeds": [
+      "Design a rate-limiting system for a public API that must handle 100,000 requests per second.",
+      "Explain the difference between authentication and authorization. How would you implement both in a FastAPI service?",
+      "When would you choose GraphQL over REST? What are the performance implications?"
+    ],
+    "evaluation_criteria": ["correctness", "practical_application", "problem_solving"]
+  },
+  {
+    "day": 6,
+    "title": "Machine Learning Fundamentals",
+    "topics": ["supervised learning", "unsupervised learning", "bias-variance tradeoff", "cross-validation", "feature engineering", "overfitting"],
+    "subtopics": {
+      "model_selection": "Bias-variance tradeoff, regularization, hyperparameter tuning",
+      "evaluation": "Precision, recall, F1, AUC-ROC, confusion matrix — when each matters",
+      "feature_engineering": "Normalization, encoding, imputation, feature selection methods"
+    },
+    "difficulty_range": ["medium", "hard"],
+    "question_seeds": [
+      "Your model achieves 99% accuracy but performs poorly in production. What could be wrong?",
+      "Explain the bias-variance tradeoff. How would you diagnose which problem you have?",
+      "You have highly imbalanced data (1000:1 class ratio). How do you handle this?"
+    ],
+    "evaluation_criteria": ["correctness", "technical_depth", "problem_solving"]
+  },
+  {
+    "day": 7,
+    "title": "Deep Learning & Neural Networks",
+    "topics": ["neural networks", "backpropagation", "CNN", "RNN", "LSTM", "attention", "optimization", "regularization"],
+    "subtopics": {
+      "architecture": "Layer types, activation functions, weight initialization, batch normalization",
+      "training": "Gradient descent variants (SGD, Adam, AdaGrad), learning rate scheduling, gradient vanishing/exploding",
+      "regularization": "Dropout, L1/L2, early stopping, data augmentation"
+    },
+    "difficulty_range": ["hard", "expert"],
+    "question_seeds": [
+      "Explain how backpropagation works mathematically. What happens when gradients vanish?",
+      "When would you use an LSTM over a simple RNN? What problem does it solve?",
+      "Your training loss is decreasing but validation loss is increasing. What's happening and how do you fix it?"
+    ],
+    "evaluation_criteria": ["technical_depth", "correctness", "problem_solving"]
+  },
+  {
+    "day": 8,
+    "title": "Large Language Models & Transformers",
+    "topics": ["attention mechanism", "transformers", "BERT", "GPT", "fine-tuning", "RAG", "prompt engineering", "embeddings"],
+    "subtopics": {
+      "attention": "Self-attention, multi-head attention, scaled dot-product attention, positional encoding",
+      "training": "Pre-training vs fine-tuning, LoRA, RLHF, instruction tuning",
+      "deployment": "Inference optimization, quantization, KV cache, batching strategies"
+    },
+    "difficulty_range": ["hard", "expert"],
+    "question_seeds": [
+      "Explain the self-attention mechanism. Why does it scale quadratically with sequence length?",
+      "What is Retrieval-Augmented Generation and when would you use it instead of fine-tuning?",
+      "How would you reduce LLM inference latency in a production setting?"
+    ],
+    "evaluation_criteria": ["technical_depth", "correctness", "practical_application"]
+  },
+  {
+    "day": 9,
+    "title": "MLOps & Production ML",
+    "topics": ["model versioning", "CI/CD for ML", "data drift", "model monitoring", "feature stores", "serving infrastructure"],
+    "subtopics": {
+      "monitoring": "Data drift, concept drift, model performance degradation detection",
+      "infrastructure": "Model registries, containerization, A/B testing, canary deployments",
+      "pipelines": "Feature pipelines, training pipelines, inference pipelines"
+    },
+    "difficulty_range": ["medium", "hard"],
+    "question_seeds": [
+      "How would you detect and handle data drift in a production ML system?",
+      "Design a model deployment system that supports A/B testing without downtime.",
+      "Your production model's performance has degraded over 3 months. What's your investigation process?"
+    ],
+    "evaluation_criteria": ["practical_application", "problem_solving", "technical_depth"]
+  },
+  {
+    "day": 10,
+    "title": "System Design & Scalability",
+    "topics": ["distributed systems", "CAP theorem", "load balancing", "horizontal scaling", "message queues", "event sourcing"],
+    "subtopics": {
+      "consistency": "CAP theorem, eventual consistency, strong consistency, consensus protocols",
+      "scalability": "Horizontal vs vertical scaling, sharding, partitioning, caching layers",
+      "messaging": "Kafka, RabbitMQ, event-driven architecture, saga pattern"
+    },
+    "difficulty_range": ["hard", "expert"],
+    "question_seeds": [
+      "Design a real-time recommendation system that must serve 1 million users with <100ms latency.",
+      "Explain the CAP theorem and how you'd make trade-offs for a financial transactions system.",
+      "How does Kafka achieve high throughput? What guarantees does it provide?"
+    ],
+    "evaluation_criteria": ["technical_depth", "problem_solving", "correctness"]
+  },
+  {
+    "day": 11,
+    "title": "Cloud & Infrastructure",
+    "topics": ["AWS/GCP/Azure", "containers", "Kubernetes", "serverless", "IaC", "networking", "storage"],
+    "subtopics": {
+      "containers": "Docker, Kubernetes orchestration, pod scheduling, auto-scaling",
+      "serverless": "Lambda, Cloud Functions, cold starts, concurrency limits",
+      "networking": "VPCs, load balancers, CDN, DNS, TCP/IP fundamentals"
+    },
+    "difficulty_range": ["medium", "hard"],
+    "question_seeds": [
+      "When would you use serverless functions over a containerized service? What are the trade-offs?",
+      "Explain how Kubernetes handles pod scheduling. What happens when a node fails?",
+      "Design the infrastructure for an ML inference service that auto-scales based on GPU demand."
+    ],
+    "evaluation_criteria": ["practical_application", "technical_depth", "problem_solving"]
+  },
+  {
+    "day": 12,
+    "title": "Security & Ethics in AI",
+    "topics": ["OWASP", "SQL injection", "XSS", "authentication vulnerabilities", "AI bias", "fairness", "privacy", "adversarial ML"],
+    "subtopics": {
+      "security": "OWASP Top 10, secrets management, input validation, output encoding",
+      "ai_safety": "Model robustness, adversarial examples, prompt injection, data poisoning",
+      "ethics": "Bias detection, fairness metrics, GDPR, model explainability, responsible AI"
+    },
+    "difficulty_range": ["medium", "hard"],
+    "question_seeds": [
+      "Explain prompt injection in LLM systems. How would you defend against it in a production application?",
+      "How would you detect and mitigate bias in a hiring algorithm?",
+      "What is adversarial machine learning? Give a real-world attack scenario and defense."
+    ],
+    "evaluation_criteria": ["correctness", "practical_application", "technical_depth"]
+  }
+]

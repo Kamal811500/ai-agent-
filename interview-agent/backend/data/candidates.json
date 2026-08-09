@@ -1,0 +1,79 @@
+[
+  {
+    "id": "cand_001",
+    "name": "Priya Sharma",
+    "level": "junior",
+    "years_experience": 1,
+    "education": "B.Tech Computer Science, VIT University (2025)",
+    "role_applied": "Junior ML Engineer",
+    "self_reported_skills": ["Python", "Pandas", "NumPy", "basic ML", "SQL basics", "Git"],
+    "projects": [
+      {
+        "name": "Sentiment Analysis on Twitter Data",
+        "description": "Fine-tuned BERT for sentiment classification on 50K tweet dataset.",
+        "tech": ["Python", "HuggingFace", "PyTorch", "scikit-learn"]
+      },
+      {
+        "name": "Student Grade Predictor",
+        "description": "Linear regression model to predict student performance using demographic data.",
+        "tech": ["Python", "scikit-learn", "Pandas", "Matplotlib"]
+      }
+    ],
+    "expected_strengths": ["Python basics", "Basic ML concepts", "Data manipulation"],
+    "expected_weaknesses": ["System design", "Production ML", "Deep mathematical foundations"],
+    "interview_strategy_hint": "Start with Python fundamentals, move to ML basics, probe on database knowledge which is likely weak."
+  },
+  {
+    "id": "cand_002",
+    "name": "Arjun Mehta",
+    "level": "mid",
+    "years_experience": 4,
+    "education": "M.S. Computer Science, IIT Delhi (2022)",
+    "role_applied": "ML Engineer",
+    "self_reported_skills": ["Python", "PyTorch", "TensorFlow", "FastAPI", "PostgreSQL", "Docker", "AWS", "distributed training"],
+    "projects": [
+      {
+        "name": "Real-time Fraud Detection System",
+        "description": "Built an ML pipeline serving 50K predictions/day using XGBoost + feature store on AWS.",
+        "tech": ["Python", "XGBoost", "Feast", "AWS SageMaker", "Kafka", "FastAPI"]
+      },
+      {
+        "name": "Multi-modal Recommendation Engine",
+        "description": "Two-tower neural network for product recommendations using text and image features.",
+        "tech": ["PyTorch", "FAISS", "Redis", "PostgreSQL", "Kubernetes"]
+      }
+    ],
+    "expected_strengths": ["ML fundamentals", "APIs", "databases", "some MLOps"],
+    "expected_weaknesses": ["LLM internals", "advanced system design at massive scale", "security"],
+    "interview_strategy_hint": "Skip basics, start at medium difficulty. Test depth on ML, databases, and system design. Probe LLM knowledge."
+  },
+  {
+    "id": "cand_003",
+    "name": "Kavya Reddy",
+    "level": "senior",
+    "years_experience": 7,
+    "education": "Ph.D. Machine Learning, CMU (2019)",
+    "role_applied": "Staff ML Engineer / Tech Lead",
+    "self_reported_skills": ["Python", "C++", "JAX", "PyTorch", "distributed systems", "LLMs", "RLHF", "Kubernetes", "Terraform", "system design"],
+    "projects": [
+      {
+        "name": "Large-scale Recommendation Platform",
+        "description": "Led design of ML platform serving 200M daily users with <50ms P99 latency.",
+        "tech": ["PyTorch", "Kubernetes", "Kafka", "Cassandra", "FAISS", "gRPC"]
+      },
+      {
+        "name": "Internal LLM Fine-tuning Platform",
+        "description": "Built an RLHF pipeline for fine-tuning 7B and 13B parameter models on proprietary data.",
+        "tech": ["JAX", "TPU", "LoRA", "RLHF", "DeepSpeed", "FSDP"]
+      },
+      {
+        "name": "MLOps Platform",
+        "description": "Designed company-wide ML platform: feature store, model registry, A/B testing, drift monitoring.",
+        "tech": ["Feast", "MLflow", "Airflow", "Kubernetes", "Prometheus", "Grafana"]
+      }
+    ],
+    "expected_strengths": ["Everything from days 6-12", "system design", "LLMs", "MLOps"],
+    "expected_weaknesses": ["May be rusty on basics", "Specific areas to probe: security, ethics"],
+    "interview_strategy_hint": "Start at hard difficulty immediately. Focus on system design, LLMs, MLOps. Push to expert level. Probe on security and AI ethics."
+  }
+]
